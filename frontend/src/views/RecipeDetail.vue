@@ -13,9 +13,6 @@ const loading = computed(() => recipeStore.loading);
 const error = computed(() => recipeStore.error);
 
 const confirmDelete = ref(false);
-const imageFile = ref(null);
-const uploadLoading = ref(false);
-const uploadError = ref('');
 
 onMounted(async () => {
   await recipeStore.fetchRecipeById(recipeId.value);
@@ -40,33 +37,10 @@ const handleDelete = async () => {
     }, 3000);
   }
 };
-
-const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    imageFile.value = file;
-  }
-};
-
-const uploadImage = async () => {
-  if (!imageFile.value) return;
-
-  uploadLoading.value = true;
-  uploadError.value = '';
-  
-  try {
-    await recipeStore.uploadRecipeImage(recipeId.value, imageFile.value);
-    imageFile.value = null;
-  } catch (err) {
-    uploadError.value = 'Failed to upload image. Please try again.';
-  } finally {
-    uploadLoading.value = false;
-  }
-};
 </script>
 
 <template>
-  <div class="recipe-detail-container">
+  <div class="recipe-container">
     <div v-if="loading" class="loading">
       <p>Loading recipe...</p>
     </div>
@@ -105,27 +79,6 @@ const uploadImage = async () => {
             class="recipe-image"
           />
           <div v-else class="no-image">No image available</div>
-          
-          <div class="image-upload">
-            <input 
-              type="file" 
-              id="recipe-image" 
-              accept="image/*" 
-              @change="handleFileChange"
-              class="file-input"
-            />
-            <label for="recipe-image" class="file-label">
-              Choose Image
-            </label>
-            <button 
-              @click="uploadImage" 
-              class="btn btn-secondary upload-btn"
-              :disabled="!imageFile || uploadLoading"
-            >
-              {{ uploadLoading ? 'Uploading...' : 'Upload' }}
-            </button>
-            <p v-if="uploadError" class="upload-error">{{ uploadError }}</p>
-          </div>
         </div>
         
         <div class="recipe-info">
@@ -196,7 +149,7 @@ const uploadImage = async () => {
 </template>
 
 <style scoped>
-.recipe-detail-container {
+.recipe-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1rem;
@@ -298,6 +251,7 @@ const uploadImage = async () => {
 .recipe-image-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .recipe-image {
@@ -316,118 +270,78 @@ const uploadImage = async () => {
   justify-content: center;
   background-color: #f9f9f9;
   border-radius: 8px;
-  margin-bottom: 1rem;
   color: #999;
   font-style: italic;
 }
 
-.image-upload {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem 0;
-}
-
-.file-input {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
-
-.file-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #f1f1f1;
-  color: #333;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.file-label:hover {
-  background-color: #e1e1e1;
-}
-
-.upload-btn {
-  flex-grow: 1;
-}
-
-.upload-error {
-  width: 100%;
-  color: #f44336;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.recipe-info {
+.recipe-details {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.info-item {
+.recipe-info {
   display: flex;
   flex-direction: column;
-}
-
-.info-item.description {
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.label {
-  font-weight: 500;
-  color: #666;
-  margin-bottom: 0.5rem;
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.value {
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.info-value {
+  font-size: 1.2rem;
+  font-weight: 600;
   color: #333;
 }
 
-.description-text {
+.recipe-description {
+  margin-bottom: 1.5rem;
   line-height: 1.6;
-  white-space: pre-line;
 }
 
-.link {
-  color: #4CAF50;
-  text-decoration: none;
-  word-break: break-all;
+.recipe-section {
+  margin-bottom: 1.5rem;
 }
 
-.link:hover {
-  text-decoration: underline;
+.recipe-section h3 {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
 
-.tag-list, .ingredient-list {
+.ingredients-list, .steps-list {
+  list-style-position: inside;
+  padding-left: 1rem;
+}
+
+.ingredients-list li, .steps-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.tags-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .tag {
-  background-color: #f0f7f0;
-  color: #4CAF50;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.3rem 0.8rem;
+  border-radius: 16px;
   font-size: 0.9rem;
-}
-
-.ingredient {
-  background-color: #f1f8fe;
-  color: #2196F3;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.no-tags, .no-ingredients {
-  color: #999;
-  font-style: italic;
 }
 
 .back-link {

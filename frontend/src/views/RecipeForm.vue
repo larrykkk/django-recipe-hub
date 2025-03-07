@@ -430,7 +430,7 @@ textarea {
 .remove-btn {
   background: none;
   border: none;
-  color: white;
+  color: #f44336;
   font-size: 1.2rem;
   padding: 0 0 0 0.5rem;
   cursor: pointer;

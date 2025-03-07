@@ -8,6 +8,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* 全局顏色變量 */
+  --color-primary: #4CAF50;
+  --color-primary-hover: #43a047;
+  --color-secondary: #f1f5f9;
+  --color-secondary-hover: #e2e8f0;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --color-text-light: #ffffff;
+  --color-text-dark: #64748b;
 }
 
 a {
@@ -31,25 +41,74 @@ h1 {
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+/* 統一按鈕樣式 */
+button,
+.btn,
+.filter-btn {
+  border-radius: 10px;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-button:hover {
-  border-color: #646cff;
+/* 主要按鈕 - 綠色 */
+button.primary,
+.btn-primary,
+.filter-btn.apply {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+}
+
+button.primary:hover,
+.btn-primary:hover,
+.filter-btn.apply:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+/* 次要按鈕 - 灰色 */
+button.secondary,
+.btn-secondary,
+.filter-btn.clear {
+  background-color: var(--color-secondary);
+  color: var(--color-text-dark);
+}
+
+button.secondary:hover,
+.btn-secondary:hover,
+.filter-btn.clear:hover {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.1);
+}
+
+/* 危險按鈕 - 紅色 */
+button.danger,
+.btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-text-light);
+}
+
+button.danger:hover,
+.btn-danger:hover {
+  background-color: var(--color-danger-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.btn:focus,
+.filter-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
 }
 
 .card {

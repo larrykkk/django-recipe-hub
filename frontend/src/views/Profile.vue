@@ -147,7 +147,7 @@ const logout = () => {
 
 <style scoped>
 .profile-container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -159,8 +159,8 @@ const logout = () => {
 }
 
 h1 {
-  margin-bottom: 2rem;
   text-align: center;
+  margin-bottom: 2rem;
   color: #333;
 }
 
@@ -171,12 +171,9 @@ h2 {
 }
 
 .error-message {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 0.75rem;
-  margin-bottom: 1.5rem;
-  border-radius: 4px;
-  text-align: center;
+  color: #f44336;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
 }
 
 .success-message {
@@ -227,6 +224,7 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: #555;
 }
 
 input {
@@ -275,7 +273,19 @@ input {
 }
 
 .logout-section {
-  text-align: center;
-  margin-top: 2rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.logout-section h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.logout-section p {
+  margin-bottom: 1.5rem;
+  color: #666;
+  line-height: 1.6;
 }
 </style>

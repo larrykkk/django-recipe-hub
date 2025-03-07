@@ -7,7 +7,7 @@ const loggedIn = computed(() => authStore.loggedIn);
 </script>
 
 <template>
-  <div class="home">
+  <div class="home-container">
     <div class="hero">
       <h1>Welcome to Recipe App</h1>
       <p>Store, organize, and discover amazing recipes</p>
@@ -20,17 +20,17 @@ const loggedIn = computed(() => authStore.loggedIn);
     </div>
     
     <div class="features">
-      <div class="feature-card">
+      <div class="feature">
         <h3>Store Your Recipes</h3>
         <p>Keep all your favorite recipes in one place and access them from anywhere.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature">
         <h3>Organize with Tags</h3>
         <p>Categorize recipes with tags to find them quickly when you need them.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature">
         <h3>Track Ingredients</h3>
         <p>Keep track of ingredients for all your recipes.</p>
       </div>
@@ -39,17 +39,15 @@ const loggedIn = computed(() => authStore.loggedIn);
 </template>
 
 <style scoped>
-.home {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
 .hero {
   text-align: center;
-  padding: 3rem 1rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  margin-bottom: 4rem;
 }
 
 .hero h1 {
@@ -61,7 +59,9 @@ const loggedIn = computed(() => authStore.loggedIn);
 .hero p {
   font-size: 1.2rem;
   color: #666;
-  margin-bottom: 2rem;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
 }
 
 .cta-buttons {
@@ -101,23 +101,24 @@ const loggedIn = computed(() => authStore.loggedIn);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
-  padding: 0 1rem;
+  margin-bottom: 4rem;
 }
 
-.feature-card {
-  background-color: #fff;
+.feature {
+  text-align: center;
   padding: 2rem;
+  background-color: #f9f9f9;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.feature-card h3 {
-  color: #4CAF50;
+.feature h3 {
   margin-bottom: 1rem;
+  color: #333;
+}
+
+.feature p {
+  color: #666;
+  line-height: 1.6;
 }
 </style>

@@ -398,34 +398,6 @@ h1::after {
   margin-top: 1rem;
 }
 
-.filter-btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.filter-btn.apply {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.filter-btn.clear {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-
-.filter-btn.apply:hover {
-  background-color: #43a047;
-}
-
-.filter-btn.clear:hover {
-  background-color: #e5e7eb;
-}
-
 .loading, .no-recipes {
   text-align: center;
   margin: 4rem 0;
@@ -540,25 +512,8 @@ h1::after {
 
 .add-recipe-btn .btn {
   font-size: 1.1rem;
-  padding: 1rem 2.5rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  text-transform: uppercase;
+  padding: 0.9rem 2rem;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
-  text-decoration: none;
-  display: inline-block;
-}
-
-.add-recipe-btn .btn:hover {
-  background-color: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.25);
 }
 
 @media (max-width: 768px) {
