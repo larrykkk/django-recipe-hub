@@ -13,11 +13,42 @@ const ingredients = computed(() => recipeStore.ingredients);
 const selectedTags = ref([]);
 const selectedIngredients = ref([]);
 const searchQuery = ref('');
+const isFilterExpanded = ref(false);
 
 onMounted(async () => {
   await recipeStore.fetchAllRecipes();
   await recipeStore.fetchAllTags();
   await recipeStore.fetchAllIngredients();
+});
+
+const toggleFilter = () => {
+  isFilterExpanded.value = !isFilterExpanded.value;
+};
+
+const toggleTag = (tagId) => {
+  const index = selectedTags.value.indexOf(tagId);
+  if (index === -1) {
+    selectedTags.value.push(tagId);
+  } else {
+    selectedTags.value.splice(index, 1);
+  }
+};
+
+const toggleIngredient = (ingredientId) => {
+  const index = selectedIngredients.value.indexOf(ingredientId);
+  if (index === -1) {
+    selectedIngredients.value.push(ingredientId);
+  } else {
+    selectedIngredients.value.splice(index, 1);
+  }
+};
+
+const getSelectedTagNames = computed(() => {
+  return tags.value.filter(tag => selectedTags.value.includes(tag.id));
+});
+
+const getSelectedIngredientNames = computed(() => {
+  return ingredients.value.filter(ingredient => selectedIngredients.value.includes(ingredient.id));
 });
 
 const filteredRecipes = computed(() => {
@@ -78,38 +109,90 @@ const clearFilters = async () => {
   <div class="recipe-list-container">
     <h1>My Recipes</h1>
     
-    <div class="filter-section">
-      <div class="search-box">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Search recipes..." 
-          class="search-input"
-        />
+    <div class="filter-container">
+      <div class="filter-header" @click="toggleFilter">
+        <div class="filter-summary">
+          <div class="search-wrapper">
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Search recipes..." 
+              class="search-input"
+              @click.stop
+            />
+          </div>
+          
+          <div v-if="!isFilterExpanded && (selectedTags.length > 0 || selectedIngredients.length > 0)" class="selected-filters">
+            <div v-if="selectedTags.length > 0" class="selected-section">
+              <span class="selected-label">Tags:</span>
+              <div class="selected-badges">
+                <div 
+                  v-for="tag in getSelectedTagNames" 
+                  :key="tag.id" 
+                  class="filter-badge active"
+                  @click.stop="toggleTag(tag.id)"
+                >
+                  {{ tag.name }}
+                </div>
+              </div>
+            </div>
+            
+            <div v-if="selectedIngredients.length > 0" class="selected-section">
+              <span class="selected-label">Ingredients:</span>
+              <div class="selected-badges">
+                <div 
+                  v-for="ingredient in getSelectedIngredientNames" 
+                  :key="ingredient.id" 
+                  class="filter-badge active"
+                  @click.stop="toggleIngredient(ingredient.id)"
+                >
+                  {{ ingredient.name }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="toggle-filter">
+            <span>{{ isFilterExpanded ? 'Hide Filters' : 'Show Filters' }}</span>
+            <i class="filter-arrow" :class="{ 'expanded': isFilterExpanded }">▼</i>
+          </div>
+        </div>
       </div>
       
-      <div class="filter-options">
-        <div class="filter-group">
-          <label>Filter by Tags</label>
-          <select multiple v-model="selectedTags" class="filter-select">
-            <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+      <div class="filters-wrapper" v-if="isFilterExpanded">
+        <div class="filter-section">
+          <h3 class="filter-title">Tags</h3>
+          <div class="badge-container">
+            <div 
+              v-for="tag in tags" 
+              :key="tag.id" 
+              @click="toggleTag(tag.id)"
+              class="filter-badge"
+              :class="{ active: selectedTags.includes(tag.id) }"
+            >
               {{ tag.name }}
-            </option>
-          </select>
+            </div>
+          </div>
         </div>
         
-        <div class="filter-group">
-          <label>Filter by Ingredients</label>
-          <select multiple v-model="selectedIngredients" class="filter-select">
-            <option v-for="ingredient in ingredients" :key="ingredient.id" :value="ingredient.id">
+        <div class="filter-section">
+          <h3 class="filter-title">Ingredients</h3>
+          <div class="badge-container">
+            <div 
+              v-for="ingredient in ingredients" 
+              :key="ingredient.id" 
+              @click="toggleIngredient(ingredient.id)"
+              class="filter-badge"
+              :class="{ active: selectedIngredients.includes(ingredient.id) }"
+            >
               {{ ingredient.name }}
-            </option>
-          </select>
+            </div>
+          </div>
         </div>
         
-        <div class="filter-buttons">
-          <button @click="applyFilters" class="btn btn-primary">Apply Filters</button>
-          <button @click="clearFilters" class="btn btn-secondary">Clear</button>
+        <div class="filter-actions">
+          <button @click="applyFilters" class="filter-btn apply">Apply</button>
+          <button @click="clearFilters" class="filter-btn clear">Clear</button>
         </div>
       </div>
     </div>
@@ -160,125 +243,229 @@ const clearFilters = async () => {
 }
 
 h1 {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   text-align: center;
-  color: #333;
+  color: #2c3e50;
+  font-size: 2.5rem;
+  font-weight: 700;
+  position: relative;
 }
 
-.filter-section {
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: #4CAF50;
+  border-radius: 2px;
+}
+
+.filter-container {
   margin-bottom: 2rem;
-  padding: 1.5rem;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.search-box {
-  margin-bottom: 1.5rem;
+.filter-header {
+  cursor: pointer;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  width: 100%;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
 }
 
-.filter-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+.search-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
 }
 
-.filter-group {
-  margin-bottom: 1rem;
+.selected-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
-.filter-group label {
-  display: block;
-  margin-bottom: 0.5rem;
+.selected-section {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.selected-label {
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.selected-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.toggle-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: #4b5563;
   font-weight: 500;
 }
 
-.filter-select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  height: 100px;
-  background-color: white;
+.filter-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
 }
 
-.filter-buttons {
+.filter-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.filters-wrapper {
+  padding: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.filter-section {
+  margin-bottom: 1.5rem;
+}
+
+.filter-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+}
+
+.badge-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.btn {
-  padding: 0.75rem 1.5rem;
+.filter-badge {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 20px;
+  font-size: 1rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.filter-badge:hover {
+  background-color: #e5e7eb;
+}
+
+.filter-badge.active {
+  background-color: #ecfdf5;
+  color: #059669;
+  border-color: #059669;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.filter-btn {
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.btn-primary {
+.filter-btn.apply {
   background-color: #4CAF50;
   color: white;
 }
 
-.btn-secondary {
-  background-color: #f1f1f1;
-  color: #333;
+.filter-btn.clear {
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
-.btn-primary:hover {
-  background-color: #45a049;
+.filter-btn.apply:hover {
+  background-color: #43a047;
 }
 
-.btn-secondary:hover {
-  background-color: #e1e1e1;
+.filter-btn.clear:hover {
+  background-color: #e5e7eb;
 }
 
 .loading, .no-recipes {
   text-align: center;
-  margin: 3rem 0;
-  color: #666;
-}
-
-.no-recipes p {
-  margin-bottom: 1.5rem;
+  margin: 4rem 0;
+  color: #64748b;
+  font-size: 1.2rem;
 }
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2.5rem;
+  margin-top: 2rem;
 }
 
 .recipe-card {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s ease;
+  border: 1px solid #eef2f7;
 }
 
 .recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .recipe-image {
-  height: 180px;
+  height: 220px;
   background-size: cover;
   background-position: center;
   position: relative;
-  background-color: #f9f9f9;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+}
+
+.recipe-card:hover .recipe-image {
+  height: 240px;
 }
 
 .no-image {
@@ -290,42 +477,102 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  color: #94a3b8;
   font-style: italic;
+  font-size: 1.1rem;
 }
 
 .recipe-info {
-  padding: 1.5rem;
+  padding: 1.8rem;
 }
 
 .recipe-info h3 {
-  margin-bottom: 0.5rem;
-  color: #333;
+  margin-bottom: 1rem;
+  color: #1e293b;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .recipe-time, .recipe-price {
-  color: #666;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipe-time::before {
+  content: '⏱';
+}
+
+.recipe-price::before {
+  content: '💰';
 }
 
 .recipe-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
 }
 
 .tag {
-  background-color: #f0f7f0;
-  color: #4CAF50;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  background-color: #ecfdf5;
+  color: #059669;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tag:hover {
+  background-color: #059669;
+  color: white;
 }
 
 .add-recipe-btn {
-  margin-top: 3rem;
+  margin-top: 4rem;
   text-align: center;
+}
+
+.add-recipe-btn .btn {
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.add-recipe-btn .btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.25);
+}
+
+@media (max-width: 768px) {
+  .recipe-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .filter-container {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
 }
 </style>
