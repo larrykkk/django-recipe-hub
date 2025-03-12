@@ -12,6 +12,7 @@ const logout = () => {
 };
 
 const loggedIn = computed(() => authStore.loggedIn);
+const userName = computed(() => authStore.user?.email || 'User');
 </script>
 
 <template>
@@ -27,8 +28,8 @@ const loggedIn = computed(() => authStore.loggedIn);
           <router-link to="/recipes/create" class="navbar-item">Create Recipe</router-link>
           <router-link to="/profile" class="navbar-item">Profile</router-link>
           <a @click="logout" class="navbar-item logout-button">
-            {{ authStore.user.username }}
-            Logout
+            <span class="user-name">{{ userName }}</span>
+            <span class="logout-text">Logout</span>
           </a>
         </template>
         <template v-else>
@@ -91,17 +92,30 @@ body {
 .navbar-item {
   color: white;
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 4px;
   transition: background-color 0.3s;
 }
 
 .navbar-item:hover {
   background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
 }
 
 .logout-button {
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-name {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.logout-text {
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  padding-left: 0.5rem;
 }
 
 .main-content {
@@ -110,5 +124,43 @@ body {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
+
+.btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }
 </style>

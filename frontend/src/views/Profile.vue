@@ -16,10 +16,14 @@ const confirmPasswordInput = ref('');
 
 onMounted(async () => {
   try {
-    // Get user profile from API
-    const response = await authService.getCurrentUserDetails();
-    currentUser.value = response.data;
-    nameInput.value = currentUser.value.name || '';
+    // Get user data from store
+    currentUser.value = authStore.user;
+    
+    if (currentUser.value) {
+      nameInput.value = currentUser.value.name || '';
+    } else {
+      error.value = 'User data not found';
+    }
   } catch (err) {
     error.value = 'Failed to load user profile';
   } finally {
@@ -44,14 +48,11 @@ const updateProfile = async () => {
       updateData.password = passwordInput.value;
     }
     
-    await authService.updateUser(updateData);
+    // Use the store method to update profile
+    await authStore.updateUserProfile(updateData);
     
-    // Update local user info
-    const user = authStore.user;
-    if (user) {
-      user.name = nameInput.value;
-      localStorage.setItem('user', JSON.stringify(user));
-    }
+    // Update local reference
+    currentUser.value = authStore.user;
     
     success.value = 'Profile updated successfully';
     passwordInput.value = '';
@@ -134,12 +135,6 @@ const logout = () => {
             </div>
           </form>
         </div>
-      </div>
-      
-      <div class="logout-section">
-        <button @click="logout" class="btn btn-danger">
-          Logout
-        </button>
       </div>
     </div>
   </div>

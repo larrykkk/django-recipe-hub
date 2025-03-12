@@ -33,6 +33,21 @@ export const useAuthStore = defineStore('auth', {
         .then(response => {
           return Promise.resolve(response.data);
         });
+    },
+    
+    updateUserProfile(userData) {
+      return authService.updateUser(userData)
+        .then(response => {
+          // Update the user in the store with new data
+          if (this.user) {
+            // Update user data in store
+            this.user = { ...this.user, ...userData };
+            
+            // Update localStorage
+            localStorage.setItem('user', JSON.stringify(this.user));
+          }
+          return Promise.resolve(response.data);
+        });
     }
   }
 });
