@@ -18,6 +18,7 @@ from core.models import (
     Recipe,
     Tag,
     Ingredient,
+    Comment,
 )
 
 from recipe.serializers import (
@@ -57,6 +58,17 @@ def create_recipe(user, **params):
 def create_user(**params):
     """Create and return a new user."""
     return get_user_model().objects.create_user(**params)
+
+
+def create_comment(user, recipe, **params):
+    """創建並返回一個示例評論。"""
+    defaults = {
+        'content': 'Sample comment',
+    }
+    defaults.update(params)
+
+    comment = Comment.objects.create(user=user, recipe=recipe, **defaults)
+    return comment
 
 
 class PublicRecipeAPITests(TestCase):
@@ -114,6 +126,20 @@ class PrivateRecipeApiTests(TestCase):
 
         serializer = RecipeDetailSerializer(recipe)
         self.assertEqual(res.data, serializer.data)
+
+    def test_get_recipe_detail_with_comments(self):
+        """測試獲取帶有評論的食譜詳情。"""
+        recipe = create_recipe(user=self.user)
+        comment1 = create_comment(user=self.user, recipe=recipe, content="First comment")
+        comment2 = create_comment(user=self.user, recipe=recipe, content="Second comment")
+        
+        url = detail_url(recipe.id)
+        res = self.client.get(url)
+        
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data['comments']), 2)
+        self.assertEqual(res.data['comments'][0]['content'], comment1.content)
+        self.assertEqual(res.data['comments'][1]['content'], comment2.content)
 
     def test_create_recipe(self):
         """Test creating a recipe."""

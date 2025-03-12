@@ -17,11 +17,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 
 from core.models import (
     Recipe,
     Tag,
     Ingredient,
+    Comment,
 )
 from recipe import serializers
 
@@ -138,3 +140,22 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in the database."""
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Manage comments in the database."""
+    serializer_class = serializers.CommentSerializer
+    queryset = Comment.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """Create a new recipe."""
+        serializer.save(user=self.request.user)
+
+    def get_object(self):
+        """Retrieve and return a comment, checking permissions."""
+        obj = super().get_object()
+        # 確保用戶只能操作自己的評論
+        if obj.user != self.request.user:
+            raise PermissionDenied("You do not have permission to modify this comment.")
+        return obj

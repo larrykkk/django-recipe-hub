@@ -7,6 +7,7 @@ from core.models import (
     Recipe,
     Tag,
     Ingredient,
+    Comment,
 )
 
 
@@ -87,13 +88,36 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Serializer for comments."""
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id',
+            'content',
+            'created_on',
+            'updated_on',
+            'recipe',
+            'user',  # 添加用戶字段
+        ]
+        read_only_fields = ['id', 'user', 'created_on', 'updated_on']
+
+    def create(self, validated_data):
+        """Create a comment and associate with authenticated user."""
+        # 自動設置當前請求的用戶為評論作者
+        validated_data['user'] = self.context['request'].user
+        return Comment.objects.create(**validated_data)
 
 
 class RecipeDetailSerializer(RecipeSerializer):
     """Serializer for recipe detail view."""
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta(RecipeSerializer.Meta):
-        fields = RecipeSerializer.Meta.fields + ['description']
+        fields = RecipeSerializer.Meta.fields + ['description', 'comments']
 
 
 class RecipeImageSerializer(serializers.ModelSerializer):

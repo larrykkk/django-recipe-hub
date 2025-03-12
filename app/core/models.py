@@ -97,3 +97,23 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+class Comment(models.Model):
+    """Comment for recipes."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+
+    content = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    deleted_on = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.content

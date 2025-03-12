@@ -26,7 +26,10 @@ const loggedIn = computed(() => authStore.loggedIn);
           <router-link to="/recipes" class="navbar-item">Recipes</router-link>
           <router-link to="/recipes/create" class="navbar-item">Create Recipe</router-link>
           <router-link to="/profile" class="navbar-item">Profile</router-link>
-          <a @click="logout" class="navbar-item logout-button">Logout</a>
+          <a @click="logout" class="navbar-item logout-button">
+            {{ authStore.user.username }}
+            Logout
+          </a>
         </template>
         <template v-else>
           <router-link to="/login" class="navbar-item">Login</router-link>

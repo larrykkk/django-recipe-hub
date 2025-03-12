@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useRecipeStore } from '../store/recipe';
+import CommentSection from '../components/CommentSection.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -131,6 +132,9 @@ const handleDelete = async () => {
           </div>
         </div>
       </div>
+      
+      <!-- Comment Section -->
+      <CommentSection :recipeId="recipe.id" />
       
       <div class="back-link">
         <router-link to="/recipes" class="btn btn-secondary">
