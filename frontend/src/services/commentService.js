@@ -6,8 +6,8 @@ const API_URL = API_PATHS.RECIPE;
 
 export default {
   // Get all comments for a recipe
-  getRecipeComments(recipeId) {
-    return axios.get(API_URL + 'comments/?recipe=' + recipeId, { headers: authHeader() });
+  getRecipeComments(recipeEncodedId) {
+    return axios.get(API_URL + 'comments/?recipe=' + recipeEncodedId, { headers: authHeader() });
   },
   
   // Create a new comment
@@ -16,12 +16,12 @@ export default {
   },
   
   // Update a comment
-  updateComment(id, comment) {
-    return axios.put(API_URL + `comments/${id}/`, comment, { headers: authHeader() });
+  updateComment(encodedId, comment) {
+    return axios.put(API_URL + `comments/${encodedId}/`, comment, { headers: authHeader() });
   },
   
   // Delete a comment
-  deleteComment(id) {
-    return axios.delete(API_URL + `comments/${id}/`, { headers: authHeader() });
+  deleteComment(encodedId) {
+    return axios.delete(API_URL + `comments/${encodedId}/`, { headers: authHeader() });
   }
 }; 

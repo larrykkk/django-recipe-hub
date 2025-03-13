@@ -25,30 +25,30 @@ const toggleFilter = () => {
   isFilterExpanded.value = !isFilterExpanded.value;
 };
 
-const toggleTag = (tagId) => {
-  const index = selectedTags.value.indexOf(tagId);
+const toggleTag = (tagEncodedId) => {
+  const index = selectedTags.value.indexOf(tagEncodedId);
   if (index === -1) {
-    selectedTags.value.push(tagId);
+    selectedTags.value.push(tagEncodedId);
   } else {
     selectedTags.value.splice(index, 1);
   }
 };
 
-const toggleIngredient = (ingredientId) => {
-  const index = selectedIngredients.value.indexOf(ingredientId);
+const toggleIngredient = (ingredientEncodedId) => {
+  const index = selectedIngredients.value.indexOf(ingredientEncodedId);
   if (index === -1) {
-    selectedIngredients.value.push(ingredientId);
+    selectedIngredients.value.push(ingredientEncodedId);
   } else {
     selectedIngredients.value.splice(index, 1);
   }
 };
 
 const getSelectedTagNames = computed(() => {
-  return tags.value.filter(tag => selectedTags.value.includes(tag.id));
+  return tags.value.filter(tag => selectedTags.value.includes(tag.encoded_id));
 });
 
 const getSelectedIngredientNames = computed(() => {
-  return ingredients.value.filter(ingredient => selectedIngredients.value.includes(ingredient.id));
+  return ingredients.value.filter(ingredient => selectedIngredients.value.includes(ingredient.encoded_id));
 });
 
 const filteredRecipes = computed(() => {
@@ -66,21 +66,21 @@ const filteredRecipes = computed(() => {
     // Filter by tags
     const matchesTags = selectedTags.value.length === 0 ? 
       true : 
-      selectedTags.value.every(tagId => recipe.tags.some(tag => tag.id === parseInt(tagId)));
+      selectedTags.value.every(tagEncodedId => recipe.tags.some(tag => tag.encoded_id === tagEncodedId));
     
     // Filter by ingredients
     const matchesIngredients = selectedIngredients.value.length === 0 ? 
       true : 
-      selectedIngredients.value.every(ingredientId => 
-        recipe.ingredients.some(ingredient => ingredient.id === parseInt(ingredientId))
+      selectedIngredients.value.every(ingredientEncodedId => 
+        recipe.ingredients.some(ingredient => ingredient.encoded_id === ingredientEncodedId)
       );
     
     return matchesSearch && matchesTags && matchesIngredients;
   });
 });
 
-const viewRecipe = (id) => {
-  router.push(`/recipes/${id}`);
+const viewRecipe = (encodedId) => {
+  router.push(`/recipes/${encodedId}`);
 };
 
 const applyFilters = async () => {
@@ -128,9 +128,9 @@ const clearFilters = async () => {
               <div class="selected-badges">
                 <div 
                   v-for="tag in getSelectedTagNames" 
-                  :key="tag.id" 
+                  :key="tag.encoded_id" 
                   class="filter-badge active"
-                  @click.stop="toggleTag(tag.id)"
+                  @click.stop="toggleTag(tag.encoded_id)"
                 >
                   {{ tag.name }}
                 </div>
@@ -142,9 +142,9 @@ const clearFilters = async () => {
               <div class="selected-badges">
                 <div 
                   v-for="ingredient in getSelectedIngredientNames" 
-                  :key="ingredient.id" 
+                  :key="ingredient.encoded_id" 
                   class="filter-badge active"
-                  @click.stop="toggleIngredient(ingredient.id)"
+                  @click.stop="toggleIngredient(ingredient.encoded_id)"
                 >
                   {{ ingredient.name }}
                 </div>
@@ -165,10 +165,10 @@ const clearFilters = async () => {
           <div class="badge-container">
             <div 
               v-for="tag in tags" 
-              :key="tag.id" 
-              @click="toggleTag(tag.id)"
+              :key="tag.encoded_id" 
+              @click="toggleTag(tag.encoded_id)"
               class="filter-badge"
-              :class="{ active: selectedTags.includes(tag.id) }"
+              :class="{ active: selectedTags.includes(tag.encoded_id) }"
             >
               {{ tag.name }}
             </div>
@@ -180,10 +180,10 @@ const clearFilters = async () => {
           <div class="badge-container">
             <div 
               v-for="ingredient in ingredients" 
-              :key="ingredient.id" 
-              @click="toggleIngredient(ingredient.id)"
+              :key="ingredient.encoded_id" 
+              @click="toggleIngredient(ingredient.encoded_id)"
               class="filter-badge"
-              :class="{ active: selectedIngredients.includes(ingredient.id) }"
+              :class="{ active: selectedIngredients.includes(ingredient.encoded_id) }"
             >
               {{ ingredient.name }}
             </div>
@@ -209,9 +209,9 @@ const clearFilters = async () => {
     <div v-else class="recipe-grid">
       <div 
         v-for="recipe in filteredRecipes" 
-        :key="recipe.id" 
+        :key="recipe.encoded_id" 
         class="recipe-card"
-        @click="viewRecipe(recipe.id)"
+        @click="viewRecipe(recipe.encoded_id)"
       >
         <div class="recipe-image" :style="recipe.link ? `background-image: url(${recipe.link})` : ''">
           <div v-if="!recipe.link" class="no-image">No Image</div>
@@ -221,7 +221,7 @@ const clearFilters = async () => {
           <p class="recipe-time">{{ recipe.time_minutes }} min</p>
           <p class="recipe-price">${{ recipe.price }}</p>
           <div class="recipe-tags">
-            <span v-for="tag in recipe.tags" :key="tag.id" class="tag">{{ tag.name }}</span>
+            <span v-for="tag in recipe.tags" :key="tag.encoded_id" class="tag">{{ tag.name }}</span>
           </div>
         </div>
       </div>

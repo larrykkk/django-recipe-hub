@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 const props = defineProps({
   recipeId: {
-    type: [String, Number],
+    type: String,
     required: true
   }
 });
@@ -44,7 +44,7 @@ const handleSubmitComment = async () => {
 };
 
 const startEditing = (comment) => {
-  editingCommentId.value = comment.id;
+  editingCommentId.value = comment.encoded_id;
   editContent.value = comment.content;
 };
 
@@ -159,7 +159,7 @@ const canManageComment = (comment) => {
         
         <div 
           v-for="comment in comments" 
-          :key="comment.id" 
+          :key="comment.encoded_id" 
           class="comment-item"
           :class="{ 'own-comment': canManageComment(comment) }"
         >
@@ -174,7 +174,7 @@ const canManageComment = (comment) => {
             
             <div v-if="canManageComment(comment)" class="comment-actions">
               <button 
-                v-if="editingCommentId !== comment.id"
+                v-if="editingCommentId !== comment.encoded_id"
                 @click="startEditing(comment)" 
                 class="action-btn edit-btn"
               >
@@ -182,17 +182,17 @@ const canManageComment = (comment) => {
               </button>
               
               <button 
-                v-if="editingCommentId !== comment.id"
-                @click="handleDelete(comment.id)" 
+                v-if="editingCommentId !== comment.encoded_id"
+                @click="handleDelete(comment.encoded_id)" 
                 class="action-btn delete-btn"
-                :class="{ 'confirm-delete': confirmDeleteId === comment.id }"
+                :class="{ 'confirm-delete': confirmDeleteId === comment.encoded_id }"
               >
-                {{ confirmDeleteId === comment.id ? 'Confirm Delete' : 'Delete' }}
+                {{ confirmDeleteId === comment.encoded_id ? 'Confirm Delete' : 'Delete' }}
               </button>
             </div>
           </div>
           
-          <div v-if="editingCommentId === comment.id" class="edit-comment-form">
+          <div v-if="editingCommentId === comment.encoded_id" class="edit-comment-form">
             <textarea 
               v-model="editContent" 
               class="comment-input"
@@ -201,7 +201,7 @@ const canManageComment = (comment) => {
             <div class="edit-actions">
               <button @click="cancelEditing" class="btn btn-secondary">Cancel</button>
               <button 
-                @click="saveEdit(comment.id)" 
+                @click="saveEdit(comment.encoded_id)" 
                 class="btn btn-primary"
                 :disabled="!editContent.trim()"
               >

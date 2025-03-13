@@ -10,10 +10,10 @@ export const useCommentStore = defineStore('comment', {
   }),
   
   actions: {
-    async fetchRecipeComments(recipeId) {
+    async fetchRecipeComments(recipeEncodedId) {
       this.loading = true;
       try {
-        const response = await commentService.getRecipeComments(recipeId);
+        const response = await commentService.getRecipeComments(recipeEncodedId);
         
         // Get current user to identify own comments
         const authStore = useAuthStore();
@@ -44,11 +44,11 @@ export const useCommentStore = defineStore('comment', {
       }
     },
     
-    async updateComment(id, comment) {
+    async updateComment(encodedId, comment) {
       this.loading = true;
       try {
-        const response = await commentService.updateComment(id, comment);
-        const index = this.comments.findIndex(c => c.id === id);
+        const response = await commentService.updateComment(encodedId, comment);
+        const index = this.comments.findIndex(c => c.encoded_id === encodedId);
         
         if (index !== -1) {
           // Update the comment while preserving the user information
@@ -67,11 +67,11 @@ export const useCommentStore = defineStore('comment', {
       }
     },
     
-    async deleteComment(id) {
+    async deleteComment(encodedId) {
       this.loading = true;
       try {
-        await commentService.deleteComment(id);
-        this.comments = this.comments.filter(comment => comment.id !== id);
+        await commentService.deleteComment(encodedId);
+        this.comments = this.comments.filter(comment => comment.encoded_id !== encodedId);
         this.loading = false;
       } catch (error) {
         this.error = error.message || 'Failed to delete comment';

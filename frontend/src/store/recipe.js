@@ -24,10 +24,10 @@ export const useRecipeStore = defineStore('recipe', {
       }
     },
     
-    async fetchRecipeById(id) {
+    async fetchRecipeById(encodedId) {
       this.loading = true;
       try {
-        const response = await recipeService.getRecipeById(id);
+        const response = await recipeService.getRecipeById(encodedId);
         this.currentRecipe = response.data;
         this.loading = false;
       } catch (error) {
@@ -50,11 +50,11 @@ export const useRecipeStore = defineStore('recipe', {
       }
     },
     
-    async updateRecipe(id, recipe) {
+    async updateRecipe(encodedId, recipe) {
       this.loading = true;
       try {
-        const response = await recipeService.updateRecipe(id, recipe);
-        const index = this.recipes.findIndex(r => r.id === id);
+        const response = await recipeService.updateRecipe(encodedId, recipe);
+        const index = this.recipes.findIndex(r => r.encoded_id === encodedId);
         if (index !== -1) this.recipes[index] = response.data;
         this.currentRecipe = response.data;
         this.loading = false;
@@ -66,11 +66,11 @@ export const useRecipeStore = defineStore('recipe', {
       }
     },
     
-    async deleteRecipe(id) {
+    async deleteRecipe(encodedId) {
       this.loading = true;
       try {
-        await recipeService.deleteRecipe(id);
-        this.recipes = this.recipes.filter(recipe => recipe.id !== id);
+        await recipeService.deleteRecipe(encodedId);
+        this.recipes = this.recipes.filter(recipe => recipe.encoded_id !== encodedId);
         this.loading = false;
       } catch (error) {
         this.error = error.message || 'Failed to delete recipe';
@@ -79,14 +79,14 @@ export const useRecipeStore = defineStore('recipe', {
       }
     },
     
-    async uploadRecipeImage(id, imageFile) {
+    async uploadRecipeImage(encodedId, imageFile) {
       this.loading = true;
       try {
-        const response = await recipeService.uploadImage(id, imageFile);
-        if (this.currentRecipe && this.currentRecipe.id === id) {
+        const response = await recipeService.uploadImage(encodedId, imageFile);
+        if (this.currentRecipe && this.currentRecipe.encoded_id === encodedId) {
           this.currentRecipe.image = response.data.image;
         }
-        const index = this.recipes.findIndex(r => r.id === id);
+        const index = this.recipes.findIndex(r => r.encoded_id === encodedId);
         if (index !== -1) this.recipes[index].image = response.data.image;
         this.loading = false;
         return response.data;

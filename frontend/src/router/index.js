@@ -30,21 +30,21 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/recipes/:id',
-    name: 'RecipeDetail',
-    component: RecipeDetail,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/recipes/create',
     name: 'RecipeCreate',
     component: RecipeForm,
     meta: { requiresAuth: true }
   },
   {
-    path: '/recipes/:id/edit',
+    path: '/recipes/:encodedId/edit',
     name: 'RecipeEdit',
     component: RecipeForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/recipes/:encodedId',
+    name: 'RecipeDetail',
+    component: RecipeDetail,
     meta: { requiresAuth: true }
   },
   {

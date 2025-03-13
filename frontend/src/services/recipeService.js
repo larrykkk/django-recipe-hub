@@ -16,27 +16,27 @@ export default {
     return axios.get(url, { headers: authHeader() });
   },
   
-  getRecipeById(id) {
-    return axios.get(API_URL + `recipes/${id}/`, { headers: authHeader() });
+  getRecipeById(encodedId) {
+    return axios.get(API_URL + `recipes/${encodedId}/`, { headers: authHeader() });
   },
   
   createRecipe(recipe) {
     return axios.post(API_URL + 'recipes/', recipe, { headers: authHeader() });
   },
   
-  updateRecipe(id, recipe) {
-    return axios.put(API_URL + `recipes/${id}/`, recipe, { headers: authHeader() });
+  updateRecipe(encodedId, recipe) {
+    return axios.put(API_URL + `recipes/${encodedId}/`, recipe, { headers: authHeader() });
   },
   
-  deleteRecipe(id) {
-    return axios.delete(API_URL + `recipes/${id}/`, { headers: authHeader() });
+  deleteRecipe(encodedId) {
+    return axios.delete(API_URL + `recipes/${encodedId}/`, { headers: authHeader() });
   },
   
-  uploadImage(id, imageFile) {
+  uploadImage(encodedId, imageFile) {
     const formData = new FormData();
     formData.append('image', imageFile);
     return axios.post(
-      API_URL + `recipes/${id}/upload-image/`, 
+      API_URL + `recipes/${encodedId}/upload-image/`, 
       formData, 
       { 
         headers: {

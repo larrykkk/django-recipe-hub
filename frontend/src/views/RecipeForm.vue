@@ -7,8 +7,8 @@ const route = useRoute();
 const router = useRouter();
 const recipeStore = useRecipeStore();
 
-const isEditMode = computed(() => !!route.params.id);
-const recipeId = computed(() => route.params.id);
+const isEditMode = computed(() => !!route.params.encodedId);
+const encodedId = computed(() => route.params.encodedId);
 
 const recipe = ref({
   title: '',
@@ -16,8 +16,8 @@ const recipe = ref({
   time_minutes: 0,
   price: 0,
   link: '',
-  tags: [], // Will now store objects with {id, name}
-  ingredients: [] // Will now store objects with {id, name}
+  tags: [], // Will now store objects with {id, encoded_id, name}
+  ingredients: [] // Will now store objects with {id, encoded_id, name}
 });
 
 const loading = ref(false);
@@ -36,7 +36,7 @@ onMounted(async () => {
     await recipeStore.fetchAllIngredients();
     
     if (isEditMode.value) {
-      await recipeStore.fetchRecipeById(recipeId.value);
+      await recipeStore.fetchRecipeById(encodedId.value);
       
       if (recipeStore.currentRecipe) {
         const r = recipeStore.currentRecipe;
@@ -47,14 +47,8 @@ onMounted(async () => {
           time_minutes: r.time_minutes,
           price: r.price,
           link: r.link || '',
-          tags: r.tags.map(tagId => {
-            const tag = tags.value.find(t => t.id === tagId);
-            return tag ? { id: tag.id, name: tag.name } : null;
-          }).filter(Boolean),
-          ingredients: r.ingredients.map(ingredientId => {
-            const ingredient = ingredients.value.find(i => i.id === ingredientId);
-            return ingredient ? { id: ingredient.id, name: ingredient.name } : null;
-          }).filter(Boolean)
+          tags: r.tags,
+          ingredients: r.ingredients
         };
       }
     }
@@ -78,11 +72,11 @@ const handleSubmit = async () => {
     console.log(submissionData)
 
     if (isEditMode.value) {
-      await recipeStore.updateRecipe(recipeId.value, submissionData);
-      router.push(`/recipes/${recipeId.value}`);
+      await recipeStore.updateRecipe(encodedId.value, submissionData);
+      router.push(`/recipes/${encodedId.value}`);
     } else {
       const newRecipe = await recipeStore.createRecipe(submissionData);
-      router.push(`/recipes/${newRecipe.id}`);
+      router.push(`/recipes/${newRecipe.encoded_id}`);
     }
   } catch (err) {
     error.value = "Failed to save recipe. Please check your input and try again.";
@@ -96,7 +90,7 @@ const addNewTag = async () => {
   if (newTagName.value.trim()) {
     try {
       const tag = await recipeStore.createTag({ name: newTagName.value.trim() });
-      recipe.value.tags.push({ id: tag.id, name: tag.name });
+      recipe.value.tags.push({ id: tag.id, encoded_id: tag.encoded_id, name: tag.name });
       newTagName.value = '';
     } catch (err) {
       console.error("Failed to add tag:", err);
@@ -108,7 +102,7 @@ const addNewIngredient = async () => {
   if (newIngredientName.value.trim()) {
     try {
       const ingredient = await recipeStore.createIngredient({ name: newIngredientName.value.trim() });
-      recipe.value.ingredients.push({ id: ingredient.id, name: ingredient.name });
+      recipe.value.ingredients.push({ id: ingredient.id, encoded_id: ingredient.encoded_id, name: ingredient.name });
       newIngredientName.value = '';
     } catch (err) {
       console.error("Failed to add ingredient:", err);
@@ -199,13 +193,13 @@ const formatPrice = (value) => {
             <div class="selected-items">
               <div 
                 v-for="tag in recipe.tags" 
-                :key="tag.id"
+                :key="tag.encoded_id"
                 class="selected-item"
               >
                 {{ tag.name }}
                 <button 
                   type="button" 
-                  @click="recipe.tags = recipe.tags.filter(t => t.id !== tag.id)"
+                  @click="recipe.tags = recipe.tags.filter(t => t.encoded_id !== tag.encoded_id)"
                   class="remove-btn"
                 >
                   ×
@@ -217,9 +211,9 @@ const formatPrice = (value) => {
               <select 
                 @change="(e) => { 
                   if (e.target.value) {
-                    const selectedTag = tags.find(t => t.id === parseInt(e.target.value));
-                    if (selectedTag) {
-                      recipe.tags.push({ id: selectedTag.id, name: selectedTag.name });
+                    const selectedTag = tags.find(t => t.encoded_id === e.target.value);
+                    if (selectedTag && !recipe.tags.some(t => t.encoded_id === selectedTag.encoded_id)) {
+                      recipe.tags.push(selectedTag);
                     }
                     e.target.value = ''; 
                   }
@@ -229,9 +223,9 @@ const formatPrice = (value) => {
                 <option value="">Select a tag</option>
                 <option 
                   v-for="tag in tags" 
-                  :key="tag.id" 
-                  :value="tag.id"
-                  :disabled="recipe.tags.some(t => t.id === tag.id)"
+                  :key="tag.encoded_id" 
+                  :value="tag.encoded_id"
+                  :disabled="recipe.tags.some(t => t.encoded_id === tag.encoded_id)"
                 >
                   {{ tag.name }}
                 </option>
@@ -262,13 +256,13 @@ const formatPrice = (value) => {
             <div class="selected-items">
               <div 
                 v-for="ingredient in recipe.ingredients" 
-                :key="ingredient.id"
+                :key="ingredient.encoded_id"
                 class="selected-item"
               >
                 {{ ingredient.name }}
                 <button 
                   type="button" 
-                  @click="recipe.ingredients = recipe.ingredients.filter(i => i.id !== ingredient.id)"
+                  @click="recipe.ingredients = recipe.ingredients.filter(i => i.encoded_id !== ingredient.encoded_id)"
                   class="remove-btn"
                 >
                   ×
@@ -280,9 +274,9 @@ const formatPrice = (value) => {
               <select 
                 @change="(e) => { 
                   if (e.target.value) {
-                    const selectedIngredient = ingredients.find(i => i.id === parseInt(e.target.value));
-                    if (selectedIngredient) {
-                      recipe.ingredients.push({ id: selectedIngredient.id, name: selectedIngredient.name });
+                    const selectedIngredient = ingredients.find(i => i.encoded_id === e.target.value);
+                    if (selectedIngredient && !recipe.ingredients.some(i => i.encoded_id === selectedIngredient.encoded_id)) {
+                      recipe.ingredients.push(selectedIngredient);
                     }
                     e.target.value = ''; 
                   }
@@ -292,9 +286,9 @@ const formatPrice = (value) => {
                 <option value="">Select an ingredient</option>
                 <option 
                   v-for="ingredient in ingredients" 
-                  :key="ingredient.id" 
-                  :value="ingredient.id"
-                  :disabled="recipe.ingredients.some(i => i.id === ingredient.id)"
+                  :key="ingredient.encoded_id" 
+                  :value="ingredient.encoded_id"
+                  :disabled="recipe.ingredients.some(i => i.encoded_id === ingredient.encoded_id)"
                 >
                   {{ ingredient.name }}
                 </option>
@@ -319,11 +313,19 @@ const formatPrice = (value) => {
           </div>
         </div>
         
-        <div class="form-buttons">
-          <button type="button" @click="router.go(-1)" class="btn btn-secondary">
+        <div class="form-actions">
+          <button 
+            type="button" 
+            @click="router.push('/recipes')" 
+            class="btn btn-secondary"
+          >
             Cancel
           </button>
-          <button type="submit" class="btn btn-primary" :disabled="loading">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            :disabled="loading"
+          >
             {{ isEditMode ? 'Update Recipe' : 'Create Recipe' }}
           </button>
         </div>
@@ -455,7 +457,7 @@ textarea {
   flex: 1;
 }
 
-.form-buttons {
+.form-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;

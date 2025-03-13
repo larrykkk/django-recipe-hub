@@ -8,7 +8,7 @@ const route = useRoute();
 const router = useRouter();
 const recipeStore = useRecipeStore();
 
-const recipeId = computed(() => route.params.id);
+const encodedId = computed(() => route.params.encodedId);
 const recipe = computed(() => recipeStore.currentRecipe);
 const loading = computed(() => recipeStore.loading);
 const error = computed(() => recipeStore.error);
@@ -16,17 +16,17 @@ const error = computed(() => recipeStore.error);
 const confirmDelete = ref(false);
 
 onMounted(async () => {
-  await recipeStore.fetchRecipeById(recipeId.value);
+  await recipeStore.fetchRecipeById(encodedId.value);
 });
 
 const handleEdit = () => {
-  router.push(`/recipes/${recipeId.value}/edit`);
+  router.push(`/recipes/${encodedId.value}/edit`);
 };
 
 const handleDelete = async () => {
   if (confirmDelete.value) {
     try {
-      await recipeStore.deleteRecipe(recipeId.value);
+      await recipeStore.deleteRecipe(encodedId.value);
       router.push('/recipes');
     } catch (err) {
       // Error is already handled in the store
@@ -108,7 +108,7 @@ const handleDelete = async () => {
             <div class="tag-list">
               <span 
                 v-for="tag in recipe.tags" 
-                :key="tag.id" 
+                :key="tag.encoded_id" 
                 class="tag"
               >
                 {{ tag.name }}
@@ -122,7 +122,7 @@ const handleDelete = async () => {
             <div class="ingredient-list">
               <span 
                 v-for="ingredient in recipe.ingredients" 
-                :key="ingredient.id" 
+                :key="ingredient.encoded_id" 
                 class="ingredient"
               >
                 {{ ingredient.name }}
@@ -134,7 +134,7 @@ const handleDelete = async () => {
       </div>
       
       <!-- Comment Section -->
-      <CommentSection :recipeId="recipe.id" />
+      <CommentSection :recipeId="recipe.encoded_id" />
       
       <div class="back-link">
         <router-link to="/recipes" class="btn btn-secondary">
