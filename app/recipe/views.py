@@ -141,6 +141,17 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'recipe',
+                OpenApiTypes.INT,
+                description='Filter comments by recipe ID',
+            ),
+        ]
+    )
+)
 class CommentViewSet(viewsets.ModelViewSet):
     """Manage comments in the database."""
     serializer_class = serializers.CommentSerializer
@@ -148,8 +159,20 @@ class CommentViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        """Retrieve comments with filtering options."""
+        recipe_id = self.request.query_params.get('recipe')
+        queryset = self.queryset
+        
+        if recipe_id:
+            queryset = queryset.filter(recipe_id=recipe_id)
+            
+        return queryset.filter(
+            user=self.request.user
+        ).order_by('-created_on')
+
     def perform_create(self, serializer):
-        """Create a new recipe."""
+        """Create a new comment."""
         serializer.save(user=self.request.user)
 
     def get_object(self):

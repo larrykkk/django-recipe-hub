@@ -121,10 +121,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class RecipeDetailSerializer(RecipeSerializer):
     """Serializer for recipe detail view."""
-    comments = CommentSerializer(many=True, read_only=True)
-
     class Meta(RecipeSerializer.Meta):
-        fields = RecipeSerializer.Meta.fields + ['description', 'comments']
+        fields = RecipeSerializer.Meta.fields + ['description']
 
 
 class RecipeImageSerializer(serializers.ModelSerializer):
