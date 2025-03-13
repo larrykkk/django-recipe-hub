@@ -9,38 +9,59 @@ from core.models import (
     Ingredient,
     Comment,
 )
+from core.utils import (
+    encode_recipe_id,
+    encode_comment_id,
+    encode_tag_id,
+    encode_ingredient_id,
+)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Serializer for ingredients."""
+    encoded_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Ingredient
-        fields = ['id', 'name']
-        read_only_fields = ['id']
+        fields = ['id', 'encoded_id', 'name']
+        read_only_fields = ['id', 'encoded_id']
+
+    def get_encoded_id(self, obj):
+        """Get encoded ID for the ingredient."""
+        return encode_ingredient_id(obj.id)
 
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for tags."""
+    encoded_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Tag
-        fields = ['id', 'name']
-        read_only_fields = ['id']
+        fields = ['id', 'encoded_id', 'name']
+        read_only_fields = ['id', 'encoded_id']
+
+    def get_encoded_id(self, obj):
+        """Get encoded ID for the tag."""
+        return encode_tag_id(obj.id)
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for recipes."""
     tags = TagSerializer(many=True, required=False)
     ingredients = IngredientSerializer(many=True, required=False)
+    encoded_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = [
-            'id', 'title', 'time_minutes', 'price', 'link', 'tags',
+            'id', 'encoded_id', 'title', 'time_minutes', 'price', 'link', 'tags',
             'ingredients',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'encoded_id']
+
+    def get_encoded_id(self, obj):
+        """Get encoded ID for the recipe."""
+        return encode_recipe_id(obj.id)
 
     def _get_or_create_tags(self, tags, recipe):
         """Handle getting or creating tags as needed."""
@@ -93,18 +114,30 @@ class RecipeSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """Serializer for comments."""
     user = serializers.SerializerMethodField()
+    encoded_id = serializers.SerializerMethodField()
+    encoded_recipe_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = [
             'id',
+            'encoded_id',
             'content',
             'created_on',
             'updated_on',
             'recipe',
+            'encoded_recipe_id',
             'user',
         ]
-        read_only_fields = ['id', 'user', 'created_on', 'updated_on']
+        read_only_fields = ['id', 'encoded_id', 'user', 'created_on', 'updated_on', 'encoded_recipe_id']
+
+    def get_encoded_id(self, obj):
+        """Get encoded ID for the comment."""
+        return encode_comment_id(obj.id)
+
+    def get_encoded_recipe_id(self, obj):
+        """Get encoded ID for the recipe."""
+        return encode_recipe_id(obj.recipe.id)
 
     def get_user(self, obj):
         """Return user details as an object with id and email."""
@@ -127,9 +160,14 @@ class RecipeDetailSerializer(RecipeSerializer):
 
 class RecipeImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to recipes."""
+    encoded_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = ['id', 'image']
-        read_only_fields = ['id']
+        fields = ['id', 'encoded_id', 'image']
+        read_only_fields = ['id', 'encoded_id']
         extra_kwargs = {'image': {'required': 'True'}}
+
+    def get_encoded_id(self, obj):
+        """Get encoded ID for the recipe."""
+        return encode_recipe_id(obj.id)

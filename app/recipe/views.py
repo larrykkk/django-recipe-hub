@@ -17,7 +17,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotFound
 
 from core.models import (
     Recipe,
@@ -26,6 +26,12 @@ from core.models import (
     Comment,
 )
 from recipe import serializers
+from core.utils import (
+    decode_recipe_id,
+    decode_tag_id,
+    decode_ingredient_id,
+    decode_comment_id,
+)
 
 
 @extend_schema_view(
@@ -50,10 +56,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'  # 默認使用 pk，但我們會在 get_object 中處理 hashid
 
     def _params_to_ints(self, qs):
         """Convert a list of strings to integers."""
-        return [int(str_id) for str_id in qs.split(',')]
+        # 嘗試將 hashids 轉換為實際 ID
+        result = []
+        for str_id in qs.split(','):
+            # 先嘗試作為 hashid 解碼
+            decoded_id = decode_tag_id(str_id)
+            if decoded_id is None:
+                # 如果解碼失敗，嘗試作為普通 ID 處理
+                try:
+                    decoded_id = int(str_id)
+                except ValueError:
+                    continue
+            result.append(decoded_id)
+        return result
 
     def get_queryset(self):
         """Retrieve recipes for authenticated user."""
@@ -70,6 +89,31 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return queryset.filter(
             user=self.request.user
         ).order_by('-id').distinct()
+
+    def get_object(self):
+        """Retrieve and return a recipe, checking permissions."""
+        # 獲取 URL 中的 ID 或 hashid
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+        
+        # 嘗試將 lookup_value 解碼為實際 ID
+        decoded_id = decode_recipe_id(lookup_value)
+        if decoded_id is None:
+            # 如果解碼失敗，嘗試作為普通 ID 處理
+            try:
+                decoded_id = int(lookup_value)
+            except ValueError:
+                raise NotFound("Invalid recipe ID")
+        
+        # 使用解碼後的 ID 查詢對象
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.filter(id=decoded_id).first()
+        if obj is None:
+            raise NotFound("Recipe not found")
+        
+        # 檢查權限
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get_serializer_class(self):
         """Return the serializer class for request."""
@@ -115,6 +159,7 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
     """Base viewset for recipe attributes."""
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
 
     def get_queryset(self):
         """Filter queryset to authenticated user."""
@@ -128,6 +173,37 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
         return queryset.filter(
             user=self.request.user
         ).order_by('-name').distinct()
+
+    def get_object(self):
+        """Retrieve and return an object, checking permissions."""
+        # 獲取 URL 中的 ID 或 hashid
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+        
+        # 根據視圖類型選擇適當的解碼函數
+        if isinstance(self, TagViewSet):
+            decoded_id = decode_tag_id(lookup_value)
+        elif isinstance(self, IngredientViewSet):
+            decoded_id = decode_ingredient_id(lookup_value)
+        else:
+            decoded_id = None
+            
+        if decoded_id is None:
+            # 如果解碼失敗，嘗試作為普通 ID 處理
+            try:
+                decoded_id = int(lookup_value)
+            except ValueError:
+                raise NotFound("Invalid ID")
+        
+        # 使用解碼後的 ID 查詢對象
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.filter(id=decoded_id).first()
+        if obj is None:
+            raise NotFound("Object not found")
+        
+        # 檢查權限
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
@@ -146,8 +222,8 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
         parameters=[
             OpenApiParameter(
                 'recipe',
-                OpenApiTypes.INT,
-                description='Filter comments by recipe ID',
+                OpenApiTypes.STR,
+                description='Filter comments by recipe ID or hashid',
             ),
         ]
     )
@@ -158,14 +234,25 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
 
     def get_queryset(self):
         """Retrieve comments with filtering options."""
-        recipe_id = self.request.query_params.get('recipe')
+        recipe_param = self.request.query_params.get('recipe')
         queryset = self.queryset
         
-        if recipe_id:
-            queryset = queryset.filter(recipe_id=recipe_id)
+        if recipe_param:
+            # 嘗試將 recipe_param 解碼為實際 ID
+            recipe_id = decode_recipe_id(recipe_param)
+            if recipe_id is None:
+                # 如果解碼失敗，嘗試作為普通 ID 處理
+                try:
+                    recipe_id = int(recipe_param)
+                except ValueError:
+                    recipe_id = None
+            
+            if recipe_id is not None:
+                queryset = queryset.filter(recipe_id=recipe_id)
             
         return queryset.filter(
             user=self.request.user
@@ -177,8 +264,27 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         """Retrieve and return a comment, checking permissions."""
-        obj = super().get_object()
+        # 獲取 URL 中的 ID 或 hashid
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+        
+        # 嘗試將 lookup_value 解碼為實際 ID
+        decoded_id = decode_comment_id(lookup_value)
+        if decoded_id is None:
+            # 如果解碼失敗，嘗試作為普通 ID 處理
+            try:
+                decoded_id = int(lookup_value)
+            except ValueError:
+                raise NotFound("Invalid comment ID")
+        
+        # 使用解碼後的 ID 查詢對象
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.filter(id=decoded_id).first()
+        if obj is None:
+            raise NotFound("Comment not found")
+        
         # 確保用戶只能操作自己的評論
         if obj.user != self.request.user:
             raise PermissionDenied("You do not have permission to modify this comment.")
+        
         return obj

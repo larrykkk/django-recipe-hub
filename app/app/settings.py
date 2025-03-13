@@ -184,3 +184,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Hashids settings
+HASHIDS_SALT = os.environ.get('HASHIDS_SALT', SECRET_KEY[:20] + "recipe_app_salt")
+HASHIDS_MIN_LENGTH = 7
