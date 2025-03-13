@@ -101,15 +101,16 @@ const formatTime = (dateString) => {
 };
 
 const canManageComment = (comment) => {
-  if (!currentUser.value) return false;
+  if (!currentUser.value || !comment.user) return false;
   
-  // User can manage their own comments
-  if (comment.user.id === currentUser.value.id) return true;
+  // Get the current user ID
+  const currentUserId = currentUser.value.id;
   
-  // Recipe owner can manage all comments (would need to add recipe owner check)
-  // Admin can manage all comments (would need to add admin check)
+  // Get the comment user ID
+  const commentUserId = typeof comment.user === 'object' ? comment.user.id : comment.user;
   
-  return false;
+  // Compare the IDs
+  return currentUserId === commentUserId;
 };
 </script>
 
@@ -160,10 +161,14 @@ const canManageComment = (comment) => {
           v-for="comment in comments" 
           :key="comment.id" 
           class="comment-item"
+          :class="{ 'own-comment': canManageComment(comment) }"
         >
           <div class="comment-header">
             <div class="comment-user">
-              <span class="username">{{ comment.user.name || 'User' }}</span>
+              <span class="username">
+                {{ comment.user.email || 'User' }}
+                <span v-if="canManageComment(comment)" class="user-badge">(You)</span>
+              </span>
               <span class="comment-time">{{ formatTime(comment.updated_on) }}</span>
             </div>
             
@@ -280,6 +285,11 @@ const canManageComment = (comment) => {
   background-color: #fff;
 }
 
+.own-comment {
+  border-left: 3px solid #4CAF50;
+  background-color: #f9fff9;
+}
+
 .comment-header {
   display: flex;
   justify-content: space-between;
@@ -295,6 +305,13 @@ const canManageComment = (comment) => {
 .username {
   font-weight: bold;
   color: #333;
+}
+
+.user-badge {
+  font-size: 0.8rem;
+  color: #4CAF50;
+  margin-left: 0.5rem;
+  font-weight: normal;
 }
 
 .comment-time {

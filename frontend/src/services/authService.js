@@ -11,23 +11,17 @@ export default {
     return axios.post(API_URL + 'token/', { email, password })
       .then(response => {
         if (response.data.token) {
-          // Store token temporarily
-          const userData = { token: response.data.token };
-          localStorage.setItem('user', JSON.stringify(userData));
+          // Store user data with token
+          const userData = {
+            id: response.data.user_id,
+            email: response.data.email,
+            name: response.data.name,
+            token: response.data.token
+          };
           
-          // Fetch user details
-          return this.fetchUserDetails(userData.token)
-            .then(userDetails => {
-              // Combine token with user details
-              const completeUserData = {
-                ...userDetails,
-                token: userData.token
-              };
-              
-              // Update localStorage with complete user data
-              localStorage.setItem('user', JSON.stringify(completeUserData));
-              return completeUserData;
-            });
+          // Save to localStorage
+          localStorage.setItem('user', JSON.stringify(userData));
+          return userData;
         }
         return response.data;
       });
@@ -52,6 +46,15 @@ export default {
     
     return axios.patch(API_URL + 'me/', userData, {
       headers: { 'Authorization': 'Token ' + user.token }
+    })
+    .then(response => {
+      // Update stored user data
+      const updatedUser = {
+        ...user,
+        ...response.data
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return response;
     });
   }
 };

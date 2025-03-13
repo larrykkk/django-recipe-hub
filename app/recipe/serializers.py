@@ -92,6 +92,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Serializer for comments."""
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -101,13 +102,19 @@ class CommentSerializer(serializers.ModelSerializer):
             'created_on',
             'updated_on',
             'recipe',
-            'user',  # 添加用戶字段
+            'user',
         ]
         read_only_fields = ['id', 'user', 'created_on', 'updated_on']
 
+    def get_user(self, obj):
+        """Return user details as an object with id and email."""
+        return {
+            'id': obj.user.id,
+            'email': obj.user.email,
+        }
+
     def create(self, validated_data):
         """Create a comment and associate with authenticated user."""
-        # 自動設置當前請求的用戶為評論作者
         validated_data['user'] = self.context['request'].user
         return Comment.objects.create(**validated_data)
 

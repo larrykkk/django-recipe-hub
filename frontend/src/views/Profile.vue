@@ -90,6 +90,7 @@ const logout = () => {
       <div class="profile-info">
         <div class="account-details">
           <h2>Account Details</h2>
+          <p><strong>User ID:</strong> {{ currentUser?.id }}</p>
           <p><strong>Email:</strong> {{ currentUser?.email }}</p>
         </div>
         

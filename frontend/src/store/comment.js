@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import commentService from '../services/commentService';
+import { useAuthStore } from './auth';
 
 export const useCommentStore = defineStore('comment', {
   state: () => ({
@@ -13,6 +14,12 @@ export const useCommentStore = defineStore('comment', {
       this.loading = true;
       try {
         const response = await commentService.getRecipeComments(recipeId);
+        
+        // Get current user to identify own comments
+        const authStore = useAuthStore();
+        const currentUser = authStore.user;
+        
+        // Process comments to add user info for display
         this.comments = response.data;
         this.loading = false;
       } catch (error) {
@@ -25,6 +32,8 @@ export const useCommentStore = defineStore('comment', {
       this.loading = true;
       try {
         const response = await commentService.createComment(comment);
+        
+        // Add the comment to the list
         this.comments.push(response.data);
         this.loading = false;
         return response.data;
@@ -40,7 +49,15 @@ export const useCommentStore = defineStore('comment', {
       try {
         const response = await commentService.updateComment(id, comment);
         const index = this.comments.findIndex(c => c.id === id);
-        if (index !== -1) this.comments[index] = response.data;
+        
+        if (index !== -1) {
+          // Update the comment while preserving the user information
+          this.comments[index] = {
+            ...this.comments[index],
+            ...response.data
+          };
+        }
+        
         this.loading = false;
         return response.data;
       } catch (error) {

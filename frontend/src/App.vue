@@ -12,7 +12,7 @@ const logout = () => {
 };
 
 const loggedIn = computed(() => authStore.loggedIn);
-const userName = computed(() => authStore.user?.email || 'User');
+const userName = computed(() => authStore.user?.name || authStore.user?.email || 'User');
 </script>
 
 <template>
@@ -26,9 +26,8 @@ const userName = computed(() => authStore.user?.email || 'User');
         <template v-if="loggedIn">
           <router-link to="/recipes" class="navbar-item">Recipes</router-link>
           <router-link to="/recipes/create" class="navbar-item">Create Recipe</router-link>
-          <router-link to="/profile" class="navbar-item">Profile</router-link>
+          <router-link to="/profile" class="navbar-item">{{ userName }}</router-link>
           <a @click="logout" class="navbar-item logout-button">
-            <span class="user-name">{{ userName }}</span>
             <span class="logout-text">Logout</span>
           </a>
         </template>
