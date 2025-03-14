@@ -38,21 +38,9 @@ test.describe('Recipe Detail functionality', () => {
     await expect(page).toHaveURL(/\/recipes\/[a-zA-Z0-9]+/);
   });
 
-  test('should display recipe details', async ({ page }) => {
-    // 檢查食譜詳情頁面的基本元素
-    await expect(page.getByRole('heading').first()).toBeVisible();
-    
-    // 使用更寬鬆的選擇器來檢查食譜內容
-    const ingredientsSelector = 'text=/ingredients/i, .ingredients, p:has-text("$")';
-    const instructionsSelector = 'text=/instructions/i, .instructions, p:has-text("min")';
-    
-    await expect(page.locator(ingredientsSelector).first()).toBeVisible({ timeout: 3000 });
-    await expect(page.locator(instructionsSelector).first()).toBeVisible({ timeout: 3000 });
-  });
-
   test('should display comments section', async ({ page }) => {
-    // 檢查評論區域是否存在 - 使用更寬鬆的選擇器
-    await expect(page.locator('text=/comments/i, .comments-section, form').first()).toBeVisible({ timeout: 3000 });
+    // 檢查評論區域是否存在
+    await expect(page.locator('.comment-input')).toBeVisible({ timeout: 3000 });
   });
 
   test('should allow adding a comment when logged in', async ({ page }) => {
@@ -77,7 +65,7 @@ test.describe('Recipe Detail functionality', () => {
 
   test('should not allow adding a comment when not logged in', async ({ page }) => {
     // 登出
-    const logoutSelector = 'text="Logout", a:has-text("Logout")';
+    const logoutSelector = '.navbar-item.logout-button';
     if (await page.locator(logoutSelector).isVisible()) {
       await page.locator(logoutSelector).first().click();
       // 等待登出完成

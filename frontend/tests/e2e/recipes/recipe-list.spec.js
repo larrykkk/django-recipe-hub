@@ -21,7 +21,7 @@ test.describe('Recipe List functionality', () => {
     await expect(page.getByRole('heading').filter({ hasText: /recipes/i })).toBeVisible({ timeout: 5000 });
     
     // 等待食譜卡片或列表項加載 - 使用更通用的選擇器，但避免嚴格模式違規
-    const recipeSelector = '.recipe-card, .recipe-item, [data-testid="recipe-item"], article, h3';
+    const recipeSelector = '.recipe-card';
     const recipeElements = page.locator(recipeSelector);
     
     // 檢查是否有至少一個元素 - 正確處理 Promise
@@ -34,7 +34,7 @@ test.describe('Recipe List functionality', () => {
 
   test('should navigate to recipe detail when clicking on a recipe', async ({page}) => {
     // 等待食譜卡片或列表項加載
-    const recipeSelector = '.recipe-card, .recipe-item, [data-testid="recipe-item"], article, h3';
+    const recipeSelector = '.recipe-card';
     const recipeElements = page.locator(recipeSelector);
     
     // 確保有至少一個食譜
