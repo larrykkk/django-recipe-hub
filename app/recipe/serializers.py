@@ -14,6 +14,7 @@ from core.utils import (
     encode_comment_id,
     encode_tag_id,
     encode_ingredient_id,
+    decode_recipe_id,
 )
 
 
@@ -116,6 +117,7 @@ class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     encoded_id = serializers.SerializerMethodField()
     encoded_recipe_id = serializers.SerializerMethodField()
+    recipe = serializers.CharField(write_only=True)  # 將 recipe 字段改為 CharField，以接受 hashid
 
     class Meta:
         model = Comment
@@ -145,6 +147,21 @@ class CommentSerializer(serializers.ModelSerializer):
             'id': obj.user.id,
             'email': obj.user.email,
         }
+
+    def validate_recipe(self, value):
+        """Validate and convert recipe hashid to Recipe object."""
+        recipe_id = decode_recipe_id(value)
+        if recipe_id is None:
+            # 如果解碼失敗，嘗試作為普通 ID 處理
+            try:
+                recipe_id = int(value)
+            except ValueError:
+                raise serializers.ValidationError('Invalid recipe ID')
+        
+        try:
+            return Recipe.objects.get(id=recipe_id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError('Recipe not found')
 
     def create(self, validated_data):
         """Create a comment and associate with authenticated user."""
