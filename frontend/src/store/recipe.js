@@ -1,6 +1,21 @@
 import { defineStore } from 'pinia';
 import recipeService from '../services/recipeService';
 
+// Action wrapper for handling loading and error states
+const withAsync = async (store, action) => {
+  store.error = null;
+  store.loading = true;
+  try {
+    const result = await action();
+    return result;
+  } catch (error) {
+    store.error = error.message || 'An error occurred';
+    throw error;
+  } finally {
+    store.loading = false;
+  }
+};
+
 export const useRecipeStore = defineStore('recipe', {
   state: () => ({
     recipes: [],
@@ -13,152 +28,115 @@ export const useRecipeStore = defineStore('recipe', {
   }),
   
   actions: {
+    resetState() {
+      this.recipes = [];
+      this.currentRecipe = null;
+      this.tags = [];
+      this.ingredients = [];
+      this.loading = false;
+      this.error = null;
+      this.currentUser = null;
+    },
+
     async fetchAllRecipes(filters = {}) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getAllRecipes(filters);
         this.recipes = response.data;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch recipes';
-        this.loading = false;
-      }
+        return response.data;
+      });
     },
     
     async fetchRecipeById(encodedId) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getRecipeById(encodedId);
         this.currentRecipe = response.data;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch recipe details';
-        this.loading = false;
-      }
+        return response.data;
+      });
     },
     
     async createRecipe(recipe) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.createRecipe(recipe);
         this.recipes.push(response.data);
-        this.loading = false;
         return response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to create recipe';
-        this.loading = false;
-        throw error;
-      }
+      });
     },
     
     async updateRecipe(encodedId, recipe) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.updateRecipe(encodedId, recipe);
         const index = this.recipes.findIndex(r => r.encoded_id === encodedId);
         if (index !== -1) this.recipes[index] = response.data;
         this.currentRecipe = response.data;
-        this.loading = false;
         return response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to update recipe';
-        this.loading = false;
-        throw error;
-      }
+      });
     },
     
     async deleteRecipe(encodedId) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         await recipeService.deleteRecipe(encodedId);
         this.recipes = this.recipes.filter(recipe => recipe.encoded_id !== encodedId);
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message || 'Failed to delete recipe';
-        this.loading = false;
-        throw error;
-      }
+      });
     },
     
     async uploadRecipeImage(encodedId, imageFile) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.uploadImage(encodedId, imageFile);
         if (this.currentRecipe && this.currentRecipe.encoded_id === encodedId) {
           this.currentRecipe.image = response.data.image;
         }
         const index = this.recipes.findIndex(r => r.encoded_id === encodedId);
         if (index !== -1) this.recipes[index].image = response.data.image;
-        this.loading = false;
         return response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to upload image';
-        this.loading = false;
-        throw error;
-      }
+      });
     },
     
     async fetchAllTags() {
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getAllTags();
         this.tags = response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch tags';
-      }
+        return response.data;
+      });
     },
     
     async fetchAllIngredients() {
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getAllIngredients();
         this.ingredients = response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch ingredients';
-      }
+        return response.data;
+      });
     },
     
     async createTag(name) {
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.createTag(name);
         this.tags.push(response.data);
         return response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to create tag';
-        throw error;
-      }
+      });
     },
     
     async createIngredient(name) {
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.createIngredient(name);
         this.ingredients.push(response.data);
         return response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to create ingredient';
-        throw error;
-      }
+      });
     },
 
     async fetchUserProfile(userId) {
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getUserProfile(userId);
         this.currentUser = response.data;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch user profile';
-        throw error;
-      }
+        return response.data;
+      });
     },
 
     async fetchUserRecipes(userId) {
-      this.loading = true;
-      try {
+      return withAsync(this, async () => {
         const response = await recipeService.getUserRecipes(userId);
         this.recipes = response.data;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message || 'Failed to fetch user recipes';
-        this.loading = false;
-        throw error;
-      }
+        return response.data;
+      });
     }
   }
 });
