@@ -16,7 +16,7 @@ from core.utils import (
     encode_ingredient_id,
     decode_recipe_id,
 )
-
+from user.serializers import UserSerializer
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Serializer for ingredients."""
@@ -51,14 +51,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
     ingredients = IngredientSerializer(many=True, required=False)
     encoded_id = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Recipe
         fields = [
-            'id', 'encoded_id', 'title', 'time_minutes', 'price', 'link', 'tags',
-            'ingredients',
+            'id', 'encoded_id', 'title', 'time_minutes', 'price', 'link', 'tags', 'ingredients', 'user'
         ]
-        read_only_fields = ['id', 'encoded_id']
+        read_only_fields = ['id', 'encoded_id', 'user']
 
     def get_encoded_id(self, obj):
         """Get encoded ID for the recipe."""

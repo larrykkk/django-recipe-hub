@@ -211,13 +211,17 @@ const clearFilters = async () => {
         v-for="recipe in filteredRecipes" 
         :key="recipe.encoded_id" 
         class="recipe-card"
-        @click="viewRecipe(recipe.encoded_id)"
       >
-        <div class="recipe-image" :style="recipe.link ? `background-image: url(${recipe.link})` : ''">
+        <div class="recipe-image" 
+             :style="recipe.link ? `background-image: url(${recipe.link})` : ''"
+             @click="viewRecipe(recipe.encoded_id)">
           <div v-if="!recipe.link" class="no-image">No Image</div>
         </div>
         <div class="recipe-info">
-          <h3>{{ recipe.title }}</h3>
+          <h3 @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
+          <p class="recipe-author" @click="$router.push(`/user/${recipe.user.id}/profile`)">
+            By {{ recipe.user.name }}
+          </p>
           <p class="recipe-time">{{ recipe.time_minutes }} min</p>
           <p class="recipe-price">${{ recipe.price }}</p>
           <div class="recipe-tags">
@@ -464,6 +468,19 @@ h1::after {
   font-size: 1.4rem;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.recipe-author {
+  color: #4CAF50;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.recipe-author:hover {
+  color: #45a049;
+  text-decoration: underline;
 }
 
 .recipe-time, .recipe-price {

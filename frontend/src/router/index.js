@@ -6,6 +6,7 @@ import RecipeList from '../views/RecipeList.vue';
 import RecipeDetail from '../views/RecipeDetail.vue';
 import RecipeForm from '../views/RecipeForm.vue';
 import Profile from '../views/Profile.vue';
+import UserProfile from '../views/UserProfile.vue';
 
 const routes = [
   {
@@ -51,6 +52,12 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user/:userId/profile',
+    name: 'UserProfile',
+    component: UserProfile,
     meta: { requiresAuth: true }
   }
 ];

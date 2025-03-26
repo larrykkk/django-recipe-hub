@@ -61,5 +61,13 @@ export default {
   
   createIngredient(name) {
     return axios.post(API_URL + 'ingredients/', { name }, { headers: authHeader() });
+  },
+
+  getUserProfile(userId) {
+    return axios.get(API_URL + `users/${userId}/profile/`, { headers: authHeader() });
+  },
+
+  getUserRecipes(userId) {
+    return axios.get(API_URL + `users/${userId}/recipes/`, { headers: authHeader() });
   }
 };

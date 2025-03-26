@@ -8,7 +8,8 @@ export const useRecipeStore = defineStore('recipe', {
     tags: [],
     ingredients: [],
     loading: false,
-    error: null
+    error: null,
+    currentUser: null
   }),
   
   actions: {
@@ -133,6 +134,29 @@ export const useRecipeStore = defineStore('recipe', {
         return response.data;
       } catch (error) {
         this.error = error.message || 'Failed to create ingredient';
+        throw error;
+      }
+    },
+
+    async fetchUserProfile(userId) {
+      try {
+        const response = await recipeService.getUserProfile(userId);
+        this.currentUser = response.data;
+      } catch (error) {
+        this.error = error.message || 'Failed to fetch user profile';
+        throw error;
+      }
+    },
+
+    async fetchUserRecipes(userId) {
+      this.loading = true;
+      try {
+        const response = await recipeService.getUserRecipes(userId);
+        this.recipes = response.data;
+        this.loading = false;
+      } catch (error) {
+        this.error = error.message || 'Failed to fetch user recipes';
+        this.loading = false;
         throw error;
       }
     }
