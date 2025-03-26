@@ -211,13 +211,22 @@ const clearFilters = async () => {
         v-for="recipe in filteredRecipes" 
         :key="recipe.encoded_id" 
         class="recipe-card"
-        @click="viewRecipe(recipe.encoded_id)"
       >
-        <div class="recipe-image" :style="recipe.link ? `background-image: url(${recipe.link})` : ''">
+        <div 
+          class="recipe-image clickable" 
+          :style="recipe.link ? `background-image: url(${recipe.link})` : ''"
+          @click="viewRecipe(recipe.encoded_id)"
+        >
           <div v-if="!recipe.link" class="no-image">No Image</div>
         </div>
         <div class="recipe-info">
-          <h3>{{ recipe.title }}</h3>
+          <h3 class="clickable" @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
+          <router-link 
+            :to="`/user/${recipe.user.id}/profile`"
+            class="recipe-author"
+          >
+            By {{ recipe.user.name }}
+          </router-link>
         </div>
       </div>
     </div>
@@ -439,6 +448,11 @@ h1::after {
 
   .recipe-info h3 {
     font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .recipe-author {
+    font-size: 0.8rem;
   }
 }
 
@@ -447,14 +461,17 @@ h1::after {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  transition: all 0.3s ease;
   border: 1px solid #eef2f7;
+  transition: all 0.3s ease;
 }
 
-.recipe-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clickable:hover {
+  opacity: 0.85;
 }
 
 .recipe-image {
@@ -490,6 +507,17 @@ h1::after {
   font-weight: 600;
   line-height: 1.4;
   text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-info h3:hover {
+  color: #4CAF50;
+}
+
+.recipe-author {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .add-recipe-btn {

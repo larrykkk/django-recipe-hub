@@ -162,13 +162,22 @@ const logout = () => {
               v-for="recipe in userRecipes" 
               :key="recipe.encoded_id" 
               class="recipe-card"
-              @click="viewRecipe(recipe.encoded_id)"
             >
-              <div class="recipe-image" :style="recipe.link ? `background-image: url(${recipe.link})` : ''">
+              <div 
+                class="recipe-image clickable" 
+                :style="recipe.link ? `background-image: url(${recipe.link})` : ''"
+                @click="viewRecipe(recipe.encoded_id)"
+              >
                 <div v-if="!recipe.link" class="no-image">No Image</div>
               </div>
               <div class="recipe-info">
-                <h3>{{ recipe.title }}</h3>
+                <h3 class="clickable" @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
+                <router-link 
+                  :to="`/user/${recipe.user.id}/profile`"
+                  class="recipe-author"
+                >
+                  By {{ recipe.user.name }}
+                </router-link>
               </div>
             </div>
           </div>
@@ -378,112 +387,40 @@ input:focus {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-}
-
-@media (max-width: 1400px) {
-  .recipe-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 1024px) {
-  .recipe-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    display: flex;
-    justify-content: space-around;
-    padding: 0;
-  }
-
-  .sidebar-item {
-    flex: 1;
-    text-align: center;
-    padding: 1rem 0.5rem;
-  }
-
-  .recipe-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .recipe-card {
-    max-width: none;
-  }
-
-  .recipe-image {
-    height: 160px;
-  }
-
-  .recipe-info {
-    padding: 1rem;
-  }
-
-  .recipe-info h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .recipe-time, .recipe-price {
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .recipe-tags {
-    gap: 0.4rem;
-    margin-top: 0.8rem;
-  }
-
-  .tag {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.8rem;
-  }
 }
 
 .recipe-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  border: 1px solid #eef2f7;
 }
 
-.recipe-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clickable:hover {
+  opacity: 0.85;
 }
 
 .recipe-image {
-  height: 220px;
+  height: 180px;
   background-size: cover;
   background-position: center;
-  position: relative;
-  background-color: #f8fafc;
 }
 
 .no-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
-  font-style: italic;
-  font-size: 1.1rem;
+  background: #f3f4f6;
+  color: #9ca3af;
 }
 
 .recipe-info {
@@ -497,6 +434,17 @@ input:focus {
   font-weight: 600;
   line-height: 1.4;
   text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-info h3:hover {
+  color: #4CAF50;
+}
+
+.recipe-author {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .recipe-time, .recipe-price {
@@ -524,5 +472,40 @@ input:focus {
   text-align: center;
   padding: 3rem 0;
   color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+  }
+
+  .sidebar-item {
+    flex: 1;
+    text-align: center;
+    padding: 1rem 0.5rem;
+  }
+
+  .recipe-image {
+    height: 160px;
+  }
+
+  .recipe-info {
+    padding: 0.8rem;
+  }
+
+  .recipe-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .recipe-author {
+    font-size: 0.8rem;
+  }
 }
 </style>
