@@ -219,9 +219,9 @@ const clearFilters = async () => {
         </div>
         <div class="recipe-info">
           <h3 @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
-          <p class="recipe-author" @click="$router.push(`/user/${recipe.user.id}/profile`)">
+          <a class="recipe-author" @click="$router.push(`/user/${recipe.user.id}/profile`)">
             By {{ recipe.user.name }}
-          </p>
+          </a>
           <p class="recipe-time">{{ recipe.time_minutes }} min</p>
           <p class="recipe-price">${{ recipe.price }}</p>
           <div class="recipe-tags">
