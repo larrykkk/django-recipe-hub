@@ -1,2 +1,2 @@
 -- 
-UPDATE core_user SET name = 'user1' WHERE id = 2;
+UPDATE core_user SET name = 'larry' WHERE id = 1;

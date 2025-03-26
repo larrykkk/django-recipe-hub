@@ -47,9 +47,15 @@ from core.utils import (
                 OpenApiTypes.STR,
                 description='Comma separated list of ingredient IDs to filter',
             ),
+            OpenApiParameter(
+                'userId',
+                OpenApiTypes.STR,
+                description='Filter by user ID',
+            ),
         ]
     )
 )
+
 class RecipeViewSet(viewsets.ModelViewSet):
     """View for manage recipe APIs."""
     serializer_class = serializers.RecipeDetailSerializer
@@ -78,13 +84,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Retrieve recipes for authenticated user."""
         tags = self.request.query_params.get('tags')
         ingredients = self.request.query_params.get('ingredients')
+        userId = self.request.query_params.get('userId')
         queryset = self.queryset
+
         if tags:
             tag_ids = self._params_to_ints(tags)
             queryset = queryset.filter(tags__id__in=tag_ids)
         if ingredients:
             ingredient_ids = self._params_to_ints(ingredients)
             queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+        if userId:
+            queryset = queryset.filter(user_id=userId)
 
         # return queryset.filter(
         #     user=self.request.user

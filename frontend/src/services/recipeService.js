@@ -68,6 +68,9 @@ export default {
   },
 
   getUserRecipes(userId) {
-    return axios.get(API_URL + `users/${userId}/recipes/`, { headers: authHeader() });
+    return axios.get(API_URL + 'recipes/', { 
+      headers: authHeader(),
+      params: { userId }
+    });
   }
 };
