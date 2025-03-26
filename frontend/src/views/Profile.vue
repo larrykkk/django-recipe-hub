@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import { useRecipeStore } from '../store/recipe';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const recipeStore = useRecipeStore();
 const currentUser = ref(null);
@@ -14,16 +15,36 @@ const success = ref('');
 const nameInput = ref('');
 const passwordInput = ref('');
 const confirmPasswordInput = ref('');
-const activeSection = ref('account'); // Default section
-const userRecipes = computed(() => recipeStore.recipes);
 const recipesLoaded = ref(false);
 
-// Watch for section changes
-watch(activeSection, async (newSection) => {
-  if (newSection === 'recipes' && !recipesLoaded.value && currentUser.value) {
+// Add userRecipes computed property
+const userRecipes = computed(() => recipeStore.recipes || []);
+
+// Map tab parameter to section names
+const TAB_MAP = {
+  '1': 'account',
+  '2': 'recipes',
+  '3': 'update'
+};
+
+const SECTION_TO_TAB = {
+  'account': '1',
+  'recipes': '2',
+  'update': '3'
+};
+
+// Compute active section from route parameter
+const activeSection = computed(() => {
+  const tab = route.query.tab || '1';
+  return TAB_MAP[tab] || 'account';
+});
+
+// Watch for section changes through URL
+watch([() => route.query.tab, currentUser], async ([newTab, user]) => {
+  if (newTab === '2' && user) {
     try {
       loading.value = true;
-      await recipeStore.fetchUserRecipes(currentUser.value.id);
+      await recipeStore.fetchUserRecipes(user.id);
       recipesLoaded.value = true;
     } catch (err) {
       error.value = 'Failed to load recipes';
@@ -31,18 +52,17 @@ watch(activeSection, async (newSection) => {
       loading.value = false;
     }
   }
-});
+}, { immediate: true });
+
+// Change tab through UI
+const changeSection = (section) => {
+  const tab = SECTION_TO_TAB[section];
+  router.push({ query: { tab }});
+};
 
 onMounted(async () => {
   try {
-    // Get user data from store
     currentUser.value = authStore.user;
-    
-    if (currentUser.value) {
-      nameInput.value = currentUser.value.name || '';
-    } else {
-      error.value = 'User data not found';
-    }
   } catch (err) {
     error.value = 'Failed to load user profile';
   } finally {
@@ -100,21 +120,21 @@ const logout = () => {
         <div 
           class="sidebar-item" 
           :class="{ active: activeSection === 'account' }"
-          @click="activeSection = 'account'"
+          @click="changeSection('account')"
         >
           Account Details
         </div>
         <div 
           class="sidebar-item" 
           :class="{ active: activeSection === 'recipes' }"
-          @click="activeSection = 'recipes'"
+          @click="changeSection('recipes')"
         >
           My Recipes
         </div>
         <div 
           class="sidebar-item" 
           :class="{ active: activeSection === 'update' }"
-          @click="activeSection = 'update'"
+          @click="changeSection('update')"
         >
           Update Profile
         </div>
