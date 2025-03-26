@@ -169,13 +169,6 @@ const logout = () => {
               </div>
               <div class="recipe-info">
                 <h3>{{ recipe.title }}</h3>
-                <p class="recipe-time">{{ recipe.time_minutes }} min</p>
-                <p class="recipe-price">${{ recipe.price }}</p>
-                <div class="recipe-tags">
-                  <span v-for="tag in recipe.tags" :key="tag.encoded_id" class="tag">
-                    {{ tag.name }}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -385,36 +378,112 @@ input:focus {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
+}
+
+@media (max-width: 1400px) {
+  .recipe-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+  }
+
+  .sidebar-item {
+    flex: 1;
+    text-align: center;
+    padding: 1rem 0.5rem;
+  }
+
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .recipe-card {
+    max-width: none;
+  }
+
+  .recipe-image {
+    height: 160px;
+  }
+
+  .recipe-info {
+    padding: 1rem;
+  }
+
+  .recipe-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .recipe-time, .recipe-price {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .recipe-tags {
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+  }
+
+  .tag {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+  }
 }
 
 .recipe-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid #eef2f7;
 }
 
 .recipe-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .recipe-image {
-  height: 180px;
+  height: 220px;
   background-size: cover;
   background-position: center;
+  position: relative;
+  background-color: #f8fafc;
 }
 
 .no-image {
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  color: #9ca3af;
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 1.1rem;
 }
 
 .recipe-info {
@@ -422,8 +491,12 @@ input:focus {
 }
 
 .recipe-info h3 {
-  margin: 0 0 0.5rem;
-  color: #1f2937;
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
 }
 
 .recipe-time, .recipe-price {
@@ -451,23 +524,5 @@ input:focus {
   text-align: center;
   padding: 3rem 0;
   color: #6b7280;
-}
-
-@media (max-width: 768px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    display: flex;
-    justify-content: space-around;
-    padding: 0;
-  }
-
-  .sidebar-item {
-    flex: 1;
-    text-align: center;
-    padding: 1rem 0.5rem;
-  }
 }
 </style>

@@ -211,22 +211,13 @@ const clearFilters = async () => {
         v-for="recipe in filteredRecipes" 
         :key="recipe.encoded_id" 
         class="recipe-card"
+        @click="viewRecipe(recipe.encoded_id)"
       >
-        <div class="recipe-image" 
-             :style="recipe.link ? `background-image: url(${recipe.link})` : ''"
-             @click="viewRecipe(recipe.encoded_id)">
+        <div class="recipe-image" :style="recipe.link ? `background-image: url(${recipe.link})` : ''">
           <div v-if="!recipe.link" class="no-image">No Image</div>
         </div>
         <div class="recipe-info">
-          <h3 @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
-          <a class="recipe-author" @click="$router.push(`/user/${recipe.user.id}/profile`)">
-            By {{ recipe.user.name }}
-          </a>
-          <p class="recipe-time">{{ recipe.time_minutes }} min</p>
-          <p class="recipe-price">${{ recipe.price }}</p>
-          <div class="recipe-tags">
-            <span v-for="tag in recipe.tags" :key="tag.encoded_id" class="tag">{{ tag.name }}</span>
-          </div>
+          <h3>{{ recipe.title }}</h3>
         </div>
       </div>
     </div>
@@ -411,9 +402,44 @@ h1::after {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
   margin-top: 2rem;
+}
+
+@media (max-width: 1400px) {
+  .recipe-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .recipe-card {
+    max-width: none;
+  }
+
+  .recipe-image {
+    height: 160px;
+  }
+
+  .recipe-info {
+    padding: 0.8rem;
+  }
+
+  .recipe-info h3 {
+    font-size: 1rem;
+  }
 }
 
 .recipe-card {
@@ -422,7 +448,7 @@ h1::after {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
   border: 1px solid #eef2f7;
 }
 
@@ -437,11 +463,6 @@ h1::after {
   background-position: center;
   position: relative;
   background-color: #f8fafc;
-  transition: all 0.3s ease;
-}
-
-.recipe-card:hover .recipe-image {
-  height: 240px;
 }
 
 .no-image {
@@ -459,67 +480,16 @@ h1::after {
 }
 
 .recipe-info {
-  padding: 1.8rem;
+  padding: 1rem;
 }
 
 .recipe-info h3 {
-  margin-bottom: 1rem;
+  margin: 0;
   color: #1e293b;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.4;
-}
-
-.recipe-author {
-  color: #4CAF50;
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.recipe-author:hover {
-  color: #45a049;
-  text-decoration: underline;
-}
-
-.recipe-time, .recipe-price {
-  color: #64748b;
-  margin-bottom: 0.8rem;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.recipe-time::before {
-  content: '⏱';
-}
-
-.recipe-price::before {
-  content: '💰';
-}
-
-.recipe-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
-}
-
-.tag {
-  background-color: #ecfdf5;
-  color: #059669;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.tag:hover {
-  background-color: #059669;
-  color: white;
+  text-align: left;
 }
 
 .add-recipe-btn {
@@ -531,20 +501,5 @@ h1::after {
   font-size: 1.1rem;
   padding: 0.9rem 2rem;
   letter-spacing: 0.5px;
-}
-
-@media (max-width: 768px) {
-  .recipe-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .filter-container {
-    padding: 1.5rem;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
 }
 </style>
