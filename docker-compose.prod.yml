@@ -22,7 +22,7 @@ services:
           cpus: '1'
           memory: 1G
     networks:
-      - app-network
+      - backend-network
 
   db:
     image: postgres:13-alpine
@@ -33,6 +33,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
+    networks:
+      - backend-network
 
   proxy:
     build:
@@ -48,19 +50,20 @@ services:
       - static-data:/vol/static
       - ./ssl:/etc/nginx/ssl
     networks:
-      - app-network
+      - backend-network
   
   frontend:
     image: ghcr.io/larrykkk/django-recipe-hub:latest
-    container_name: frontend
     ports:
       - "5173:5173"
     restart: unless-stopped
     networks:
-      - app-network
+      - frontend-network
 
 networks:
-  app-network:
+  frontend-network:
+    driver: bridge
+  backend-network:
     driver: bridge
 
 volumes:

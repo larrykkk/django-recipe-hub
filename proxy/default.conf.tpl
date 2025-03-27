@@ -5,7 +5,9 @@ server {
         proxy_pass http://frontend:5173;
     }
 
-    location /api/ {
-        proxy_pass http://app:8000;
+    location /api {
+        uwsgi_pass              ${APP_HOST}:${APP_PORT};
+        include                 /etc/nginx/uwsgi_params;
+        client_max_body_size    10M;
     }
 }
