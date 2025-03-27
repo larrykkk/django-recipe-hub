@@ -160,12 +160,10 @@ SPECTACULAR_SETTINGS = {
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'http://52.77.216.122',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
-    'http://52.77.216.122',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
