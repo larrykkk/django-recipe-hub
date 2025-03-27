@@ -1,6 +1,5 @@
 server {
-    listen 80;
-    server_name your_domain.com;
+    listen ${LISTEN_PORT};
 
     # Frontend 路由
     location / {
