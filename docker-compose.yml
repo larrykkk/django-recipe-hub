@@ -35,6 +35,18 @@ services:
     ports: 
       - "5432:5432"
 
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000/api
+    command: npm run dev -- --host
+
 volumes:
   dev-db-data:
   dev-static-data:
