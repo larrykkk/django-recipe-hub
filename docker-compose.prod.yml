@@ -14,8 +14,16 @@ services:
       - DB_PASS=${DB_PASS}
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    networks:
+      - app-network
 
   db:
     image: postgres:13-alpine
@@ -33,17 +41,28 @@ services:
     restart: always
     depends_on:
       - app
+      - frontend
     ports:
-      - 80:8000
+      - 80:80
+      - 443:443
     volumes:
       - static-data:/vol/static
+      - ./ssl:/etc/nginx/ssl
+    networks:
+      - app-network
   
   frontend:
     image: ghcr.io/larrykkk/django-recipe-hub:latest
     container_name: frontend
-    ports:
-      - "5173:5173"
+    expose:
+      - 5173
     restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres-data:
