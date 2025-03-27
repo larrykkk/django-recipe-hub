@@ -51,6 +51,7 @@ services:
       - ./ssl:/etc/nginx/ssl
     networks:
       - backend-network
+      - frontend-network
   
   frontend:
     image: ghcr.io/larrykkk/django-recipe-hub:latest
