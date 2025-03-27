@@ -81,3 +81,12 @@ docker-compose down
 docker-compose up --build
 ```
 ```
+
+4. 常用指令：
+```bash
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml build --no-cache
+docker-compose -f docker-compose.prod.yml up -d
+
+docker compose -f docker-compose.prod.yml pull frontend
+docker compose -f docker-compose.prod.yml up -d frontend
