@@ -18,8 +18,25 @@ env:
   APP_IMAGE_NAME: larrykkk/django-recipe-app
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            app:
+              - 'app/**'
+
   build-and-push-frontend:
-    if: contains(github.event.head_commit.modified, 'frontend/')
+    needs: check-changes
+    if: needs.check-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -62,7 +79,8 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-and-push-app:
-    if: contains(github.event.head_commit.modified, 'app/')
+    needs: check-changes
+    if: needs.check-changes.outputs.app == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
