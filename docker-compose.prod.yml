@@ -1,7 +1,8 @@
 services:
   app:
-    build:
-      context: .
+    # build:
+    #   context: .
+    image: ghcr.io/larrykkk/django-recipe-app:latest
     restart: always
     volumes:
       - static-data:/vol/web
