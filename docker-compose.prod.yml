@@ -37,6 +37,13 @@ services:
       - 80:8000
     volumes:
       - static-data:/vol/static
+  
+  frontend:
+    image: ghcr.io/larrykkk/django-recipe-hub:latest
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
 
 volumes:
   postgres-data:
