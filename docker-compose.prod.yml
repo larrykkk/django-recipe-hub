@@ -1,7 +1,5 @@
 services:
   app:
-    # build:
-    #   context: .
     image: ghcr.io/larrykkk/django-recipe-app:latest
     restart: always
     volumes:
