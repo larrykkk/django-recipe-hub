@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import { useRecipeStore } from '../store/recipe';
@@ -60,14 +60,40 @@ const changeSection = (section) => {
   router.push({ query: { tab }});
 };
 
+const closeAllDropdowns = () => {
+  userRecipes.value.forEach(recipe => {
+    recipe.showDropdown = false;
+  });
+};
+
+const handleClickOutside = (event) => {
+  const dropdowns = document.querySelectorAll('.dropdown');
+  let clickedOutside = true;
+  
+  dropdowns.forEach(dropdown => {
+    if (dropdown.contains(event.target)) {
+      clickedOutside = false;
+    }
+  });
+
+  if (clickedOutside) {
+    closeAllDropdowns();
+  }
+};
+
 onMounted(async () => {
   try {
     currentUser.value = authStore.user;
+    document.addEventListener('click', handleClickOutside);
   } catch (err) {
     error.value = 'Failed to load user profile';
   } finally {
     loading.value = false;
   }
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 
 const updateProfile = async () => {
@@ -100,6 +126,18 @@ const updateProfile = async () => {
 
 const viewRecipe = (encodedId) => {
   router.push(`/recipes/${encodedId}`);
+};
+
+const deleteRecipe = async (encodedId) => {
+  if (confirm('Are you sure you want to delete this recipe?')) {
+    try {
+      await recipeStore.deleteRecipe(encodedId);
+      // Refresh the recipes list
+      await recipeStore.fetchUserRecipes(currentUser.value.id);
+    } catch (err) {
+      error.value = 'Failed to delete recipe';
+    }
+  }
 };
 
 const logout = () => {
@@ -157,27 +195,32 @@ const logout = () => {
             <p>You haven't created any recipes yet.</p>
             <router-link to="/recipes/create" class="btn btn-primary">Create Recipe</router-link>
           </div>
-          <div v-else class="recipe-grid">
+          <div v-else class="recipe-list">
             <div 
               v-for="recipe in userRecipes" 
               :key="recipe.encoded_id" 
-              class="recipe-card"
+              class="recipe-list-item"
             >
-              <div 
-                class="recipe-image clickable" 
-                :style="recipe.link ? `background-image: url(${recipe.link})` : ''"
-                @click="viewRecipe(recipe.encoded_id)"
-              >
-                <div v-if="!recipe.link" class="no-image">No Image</div>
+              <div class="recipe-title" @click="viewRecipe(recipe.encoded_id)">
+                {{ recipe.title }}
               </div>
-              <div class="recipe-info">
-                <h3 class="clickable" @click="viewRecipe(recipe.encoded_id)">{{ recipe.title }}</h3>
-                <router-link 
-                  :to="`/user/${recipe.user.id}/profile`"
-                  class="recipe-author"
-                >
-                  By {{ recipe.user.name }}
-                </router-link>
+              <div class="recipe-date">
+                {{ new Date(recipe.created_at).toLocaleString() }}
+              </div>
+              <div class="recipe-actions">
+                <div class="dropdown">
+                  <button class="dropdown-toggle" @click="recipe.showDropdown = !recipe.showDropdown">
+                    <span class="dots">•••</span>
+                  </button>
+                  <div class="dropdown-menu" v-if="recipe.showDropdown">
+                    <router-link :to="`/recipes/${recipe.encoded_id}/edit`" class="dropdown-item">
+                      Edit
+                    </router-link>
+                    <button class="dropdown-item delete" @click="deleteRecipe(recipe.encoded_id)">
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -293,6 +336,8 @@ const logout = () => {
 
 .content-section {
   animation: fadeIn 0.3s ease;
+  height: 600px;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -385,87 +430,135 @@ input:focus {
   cursor: not-allowed;
 }
 
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.recipe-card {
-  background: white;
+.recipe-list {
+  width: 100%;
+  background-color: #f9fafb;
   border-radius: 8px;
+  border: 2px solid #4CAF50;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  max-height: calc(600px - 4rem); /* Subtracting space for the title */
+  overflow-y: auto;
 }
 
-.clickable {
+.recipe-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+}
+
+.recipe-list-item:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.recipe-list-item:last-child {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.recipe-title {
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 1rem;
+  color: #374151;
+  flex: 1;
 }
 
-.clickable:hover {
-  opacity: 0.85;
-}
-
-.recipe-image {
-  height: 180px;
-  background-size: cover;
-  background-position: center;
-}
-
-.no-image {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f3f4f6;
-  color: #9ca3af;
-}
-
-.recipe-info {
-  padding: 1rem;
-}
-
-.recipe-info h3 {
-  margin: 0;
-  color: #1e293b;
-  font-size: 1.2rem;
-  font-weight: 600;
-  line-height: 1.4;
-  text-align: left;
-  margin-bottom: 0.5rem;
-}
-
-.recipe-info h3:hover {
+.recipe-title:hover {
   color: #4CAF50;
 }
 
-.recipe-author {
-  color: #64748b;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.recipe-time, .recipe-price {
+.recipe-date {
   color: #6b7280;
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  margin-right: 1.5rem;
+  min-width: 150px;
+  text-align: right;
 }
 
-.recipe-tags {
+.recipe-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  align-items: center;
 }
 
-.tag {
-  background: #ecfdf5;
-  color: #059669;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #6b7280;
+  font-size: 1.2rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 10;
+  min-width: 140px;
+  border: 1px solid #e5e7eb;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+  font-size: 0.875rem;
+  text-decoration: none;
+  border: none;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-item.delete {
+  color: #dc2626;
+  width: 100%;
+  font-weight: 500;
+  border-radius: 0;
+}
+
+.dropdown-item.delete:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.dropdown-item + .dropdown-item {
+  border-top: 1px solid #e5e7eb;
+}
+
+.dots {
+  font-size: 1.25rem;
+  line-height: 0.5;
+  letter-spacing: 1px;
 }
 
 .no-recipes {
@@ -491,21 +584,12 @@ input:focus {
     padding: 1rem 0.5rem;
   }
 
-  .recipe-image {
-    height: 160px;
-  }
-
-  .recipe-info {
-    padding: 0.8rem;
-  }
-
-  .recipe-info h3 {
+  .recipe-title {
     font-size: 1rem;
-    margin-bottom: 0.3rem;
   }
 
-  .recipe-author {
-    font-size: 0.8rem;
+  .recipe-actions {
+    display: none;
   }
 }
 </style>
