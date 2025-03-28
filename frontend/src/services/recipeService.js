@@ -55,12 +55,12 @@ export default {
     return axios.get(API_URL + 'ingredients/', { headers: authHeader() });
   },
   
-  createTag(name) {
-    return axios.post(API_URL + 'tags/', { name }, { headers: authHeader() });
+  createTag(tag) {
+    return axios.post(API_URL + 'tags/', tag, { headers: authHeader() });
   },
   
-  createIngredient(name) {
-    return axios.post(API_URL + 'ingredients/', { name }, { headers: authHeader() });
+  createIngredient(ingredient) {
+    return axios.post(API_URL + 'ingredients/', ingredient, { headers: authHeader() });
   },
 
   getUserProfile(userId) {

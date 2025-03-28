@@ -166,6 +166,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
                             viewsets.GenericViewSet):
     """Base viewset for recipe attributes."""
     authentication_classes = [TokenAuthentication]
@@ -215,6 +216,10 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
         # 檢查權限
         self.check_object_permissions(self.request, obj)
         return obj
+
+    def perform_create(self, serializer):
+        """Create a new object."""
+        serializer.save(user=self.request.user)
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
