@@ -99,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # return queryset.filter(
         #     user=self.request.user
         # ).order_by('-id').distinct()
-        return queryset
+        return queryset.order_by('-id').distinct()
 
     def get_object(self):
         """Retrieve and return a recipe, checking permissions."""
