@@ -174,13 +174,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-to-ec2:
-    needs: check-changes
+    needs: [build-and-push-frontend, build-and-push-app, build-and-push-proxy]
     if: |
       github.event_name == 'push' && 
       github.ref == 'refs/heads/main' && 
-      (needs.check-changes.outputs.frontend == 'true' || 
-       needs.check-changes.outputs.app == 'true' || 
-       needs.check-changes.outputs.proxy == 'true')
+      (success() || failure())
     runs-on: ubuntu-latest
     
     steps:
@@ -192,13 +190,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to EC2
+        if: |
+          needs.check-changes.outputs.frontend == 'true' || 
+          needs.check-changes.outputs.app == 'true' || 
+          needs.check-changes.outputs.proxy == 'true'
         run: |
-          aws ec2 send-command \
-            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+          aws ssm send-command \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --parameters commands=[
-              "cd /home/ubuntu/django-recipe-hub",
-              "docker-compose pull",
-              "docker-compose down",
-              "docker-compose up -d"
-            ] 
+            --parameters 'commands=["cd /home/ubuntu/django-recipe-hub", "docker-compose pull", "docker-compose down", "docker-compose up -d"]' 
