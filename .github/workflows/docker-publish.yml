@@ -48,6 +48,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      build_and_push_success: ${{ steps.set_output.outputs.build_and_push_success }}
 
     steps:
       - name: Checkout repository
@@ -76,6 +78,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
+        id: pushed
         with:
           context: frontend
           file: frontend/dockerfile.prod
@@ -84,6 +87,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          
+      - name: Set success output
+        id: set_output
+        run: echo "build_and_push_success=true" >> $GITHUB_OUTPUT
 
   build-and-push-app:
     needs: check-changes
@@ -92,6 +99,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      build_and_push_success: ${{ steps.set_output.outputs.build_and_push_success }}
 
     steps:
       - name: Checkout repository
@@ -120,6 +129,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
+        id: pushed
         with:
           context: .
           file: Dockerfile
@@ -128,6 +138,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          
+      - name: Set success output
+        id: set_output
+        run: echo "build_and_push_success=true" >> $GITHUB_OUTPUT
 
   build-and-push-proxy:
     needs: check-changes
@@ -136,6 +150,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      build_and_push_success: ${{ steps.set_output.outputs.build_and_push_success }}
 
     steps:
       - name: Checkout repository
@@ -164,6 +180,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
+        id: pushed
         with:
           context: proxy
           file: proxy/Dockerfile
@@ -172,13 +189,19 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          
+      - name: Set success output
+        id: set_output
+        run: echo "build_and_push_success=true" >> $GITHUB_OUTPUT
 
   deploy-to-ec2:
     needs: [build-and-push-frontend, build-and-push-app, build-and-push-proxy]
     if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      (success() || failure())
+      (always() && (
+        (needs.build-and-push-frontend.result == 'success' && needs.build-and-push-frontend.outputs.build_and_push_success == 'true') ||
+        (needs.build-and-push-app.result == 'success' && needs.build-and-push-app.outputs.build_and_push_success == 'true') ||
+        (needs.build-and-push-proxy.result == 'success' && needs.build-and-push-proxy.outputs.build_and_push_success == 'true')
+      )) && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     
     steps:
@@ -190,10 +213,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to EC2
-        if: |
-          needs.check-changes.outputs.frontend == 'true' || 
-          needs.check-changes.outputs.app == 'true' || 
-          needs.check-changes.outputs.proxy == 'true'
         run: |
           aws ssm send-command \
             --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
