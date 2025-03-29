@@ -19,7 +19,7 @@ env:
   FRONTEND_IMAGE_NAME: larrykkk/django-recipe-hub
   APP_IMAGE_NAME: larrykkk/django-recipe-app
   PROXY_IMAGE_NAME: larrykkk/django-recipe-proxy
-  AWS_REGION: ap-northeast-1
+  AWS_REGION: ap-southeast-1
 
 jobs:
   check-changes:
