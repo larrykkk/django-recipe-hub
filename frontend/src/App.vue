@@ -22,6 +22,7 @@ const userName = computed(() => authStore.user?.name || authStore.user?.email ||
         <router-link to="/" class="navbar-logo">Recipe App</router-link>
       </div>
       <div class="navbar-menu">
+        <a href="/api/docs" target="_blank" class="navbar-item">API Docs</a>
         <router-link to="/" class="navbar-item">Home</router-link>
         <template v-if="loggedIn">
           <router-link to="/recipes" class="navbar-item">Recipes</router-link>
