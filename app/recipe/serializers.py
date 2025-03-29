@@ -56,9 +56,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = [
-            'id', 'encoded_id', 'title', 'time_minutes', 'price', 'link', 'tags', 'ingredients', 'user'
+            'id', 'encoded_id', 'title', 'time_minutes', 'price', 'link', 'tags', 'ingredients', 'user', 'created_at',
+            'updated_at'
         ]
-        read_only_fields = ['id', 'encoded_id', 'user']
+        read_only_fields = ['id', 'encoded_id', 'user', 'created_at', 'updated_at']
 
     def get_encoded_id(self, obj):
         """Get encoded ID for the recipe."""
