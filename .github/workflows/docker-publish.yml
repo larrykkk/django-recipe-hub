@@ -6,16 +6,20 @@ on:
     paths:
       - 'frontend/**'
       - 'app/**'
+      - 'proxy/**'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'frontend/**'
       - 'app/**'
+      - 'proxy/**'
 
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: larrykkk/django-recipe-hub
   APP_IMAGE_NAME: larrykkk/django-recipe-app
+  PROXY_IMAGE_NAME: larrykkk/django-recipe-proxy
+  AWS_REGION: ap-northeast-1
 
 jobs:
   check-changes:
@@ -23,6 +27,7 @@ jobs:
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       app: ${{ steps.filter.outputs.app }}
+      proxy: ${{ steps.filter.outputs.proxy }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -33,6 +38,8 @@ jobs:
               - 'frontend/**'
             app:
               - 'app/**'
+            proxy:
+              - 'proxy/**'
 
   build-and-push-frontend:
     needs: check-changes
@@ -120,4 +127,73 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max 
+          cache-to: type=gha,mode=max
+
+  build-and-push-proxy:
+    needs: check-changes
+    if: needs.check-changes.outputs.proxy == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.PROXY_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix={{branch}}-
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: proxy
+          file: proxy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-to-ec2:
+    needs: [build-and-push-frontend, build-and-push-app, build-and-push-proxy]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to EC2
+        run: |
+          aws ec2 send-command \
+            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands=[
+              "cd /home/ubuntu/django-recipe-hub",
+              "docker-compose pull",
+              "docker-compose down",
+              "docker-compose up -d"
+            ] 

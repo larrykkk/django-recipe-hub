@@ -35,8 +35,7 @@ services:
       - backend-network
 
   proxy:
-    build:
-      context: ./proxy
+    image: ghcr.io/larrykkk/django-recipe-proxy:latest
     restart: always
     depends_on:
       - app
