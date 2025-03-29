@@ -174,8 +174,13 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-to-ec2:
-    needs: [build-and-push-frontend, build-and-push-app, build-and-push-proxy]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check-changes
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' && 
+      (needs.check-changes.outputs.frontend == 'true' || 
+       needs.check-changes.outputs.app == 'true' || 
+       needs.check-changes.outputs.proxy == 'true')
     runs-on: ubuntu-latest
     
     steps:
