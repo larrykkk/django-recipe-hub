@@ -336,8 +336,10 @@ const logout = () => {
 
 .content-section {
   animation: fadeIn 0.3s ease;
-  height: 600px;
+  height: 100%;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes fadeIn {
@@ -436,8 +438,10 @@ input:focus {
   border-radius: 8px;
   border: 2px solid #4CAF50;
   overflow: hidden;
-  max-height: calc(600px - 4rem); /* Subtracting space for the title */
-  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .recipe-list-item {
@@ -447,6 +451,7 @@ input:focus {
   padding: 0.7rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
   background-color: white;
+  flex-shrink: 0;
 }
 
 .recipe-list-item:first-child {

@@ -202,8 +202,14 @@ const clearFilters = async () => {
     </div>
     
     <div v-else-if="filteredRecipes.length === 0" class="no-recipes">
-      <p>No recipes found. Try adjusting your filters or add a new recipe.</p>
-      <router-link to="/recipes/create" class="btn btn-primary">Add Recipe</router-link>
+      <p>Oops! Looks like our kitchen is empty. Time to add your culinary masterpiece! 🍳</p>
+
+      <div class="add-recipe-btn">
+        <router-link to="/recipes/create" class="btn btn-primary">
+          Add New Recipe
+        </router-link>
+      </div>
+      <!-- <router-link to="/recipes/create" class="btn btn-primary">Add Recipe</router-link> -->
     </div>
     
     <div v-else class="recipe-grid">
@@ -229,12 +235,6 @@ const clearFilters = async () => {
           </router-link>
         </div>
       </div>
-    </div>
-    
-    <div class="add-recipe-btn">
-      <router-link to="/recipes/create" class="btn btn-primary">
-        Add New Recipe
-      </router-link>
     </div>
   </div>
 </template>
@@ -404,9 +404,16 @@ h1::after {
 
 .loading, .no-recipes {
   text-align: center;
-  margin: 4rem 0;
+  margin: 0.5rem 0;
   color: #64748b;
   font-size: 1.2rem;
+}
+
+.no-recipes {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
 }
 
 .recipe-grid {
@@ -521,7 +528,7 @@ h1::after {
 }
 
 .add-recipe-btn {
-  margin-top: 4rem;
+  margin-top: 1.5rem;
   text-align: center;
 }
 

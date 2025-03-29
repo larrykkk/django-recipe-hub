@@ -19,25 +19,25 @@ onMounted(async () => {
   await recipeStore.fetchRecipeById(encodedId.value);
 });
 
-const handleEdit = () => {
-  router.push(`/recipes/${encodedId.value}/edit`);
-};
+// const handleEdit = () => {
+//   router.push(`/recipes/${encodedId.value}/edit`);
+// };
 
-const handleDelete = async () => {
-  if (confirmDelete.value) {
-    try {
-      await recipeStore.deleteRecipe(encodedId.value);
-      router.push('/recipes');
-    } catch (err) {
-      // Error is already handled in the store
-    }
-  } else {
-    confirmDelete.value = true;
-    setTimeout(() => {
-      confirmDelete.value = false;
-    }, 3000);
-  }
-};
+// const handleDelete = async () => {
+//   if (confirmDelete.value) {
+//     try {
+//       await recipeStore.deleteRecipe(encodedId.value);
+//       router.push('/recipes');
+//     } catch (err) {
+//       // Error is already handled in the store
+//     }
+//   } else {
+//     confirmDelete.value = true;
+//     setTimeout(() => {
+//       confirmDelete.value = false;
+//     }, 3000);
+//   }
+// };
 </script>
 
 <template>
@@ -59,7 +59,7 @@ const handleDelete = async () => {
           <h1>{{ recipe.title }}</h1>
         </div>
         
-        <div class="recipe-actions">
+        <!-- <div class="recipe-actions">
           <button @click="handleEdit" class="btn btn-primary">Edit</button>
           <button 
             @click="handleDelete" 
@@ -68,7 +68,7 @@ const handleDelete = async () => {
           >
             {{ confirmDelete ? 'Confirm Delete' : 'Delete' }}
           </button>
-        </div>
+        </div> -->
       </div>
       
       <div class="recipe-content">
@@ -183,10 +183,10 @@ const handleDelete = async () => {
   color: #333;
 }
 
-.recipe-actions {
+/* .recipe-actions {
   display: flex;
   gap: 1rem;
-}
+} */
 
 .btn {
   padding: 0.75rem 1.5rem;
