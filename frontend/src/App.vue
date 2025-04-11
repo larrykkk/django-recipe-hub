@@ -1,9 +1,10 @@
 <script setup>
 import { useAuthStore } from './store/auth';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const isMenuOpen = ref(false);
 
@@ -16,33 +17,45 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 
+const handleMenuClick = (to) => {
+  if (route.path === to) {
+    isMenuOpen.value = false;
+  }
+};
+
 const loggedIn = computed(() => authStore.loggedIn);
 const userName = computed(() => authStore.user?.name || authStore.user?.email || 'User');
+
+// Watch for route changes and close the menu
+watch(() => route.path, () => {
+  isMenuOpen.value = false;
+});
+
 </script>
 
 <template>
   <div class="app-container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <router-link to="/" class="navbar-logo">Recipe App</router-link>
+        <router-link to="/" class="navbar-logo" @click="handleMenuClick('/')">Recipe App</router-link>
       </div>
       <button class="menu-toggle" @click="toggleMenu">
         <span class="menu-icon"></span>
       </button>
       <div class="navbar-menu" :class="{ 'is-open': isMenuOpen }">
         <a href="/api/docs" target="_blank" class="navbar-item">API Docs</a>
-        <router-link to="/" class="navbar-item">Home</router-link>
+        <router-link to="/" class="navbar-item" @click="handleMenuClick('/')">Home</router-link>
         <template v-if="loggedIn">
-          <router-link to="/recipes" class="navbar-item">Recipes</router-link>
-          <router-link to="/recipes/create" class="navbar-item">Create Recipe</router-link>
-          <router-link to="/profile" class="navbar-item">{{ userName }}</router-link>
+          <router-link to="/recipes" class="navbar-item" @click="handleMenuClick('/recipes')">Recipes</router-link>
+          <router-link to="/recipes/create" class="navbar-item" @click="handleMenuClick('/recipes/create')">Create Recipe</router-link>
+          <router-link to="/profile" class="navbar-item" @click="handleMenuClick('/profile')">{{ userName }}</router-link>
           <a @click="logout" class="navbar-item logout-button">
             <span class="logout-text">Logout</span>
           </a>
         </template>
         <template v-else>
-          <router-link to="/login" class="navbar-item">Login</router-link>
-          <router-link to="/register" class="navbar-item">Register</router-link>
+          <router-link to="/login" class="navbar-item" @click="handleMenuClick('/login')">Login</router-link>
+          <router-link to="/register" class="navbar-item" @click="handleMenuClick('/register')">Register</router-link>
         </template>
       </div>
     </nav>
@@ -125,8 +138,8 @@ body {
 }
 
 .logout-text {
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  padding-left: 0.5rem;
+  /* border-left: 1px solid rgba(255, 255, 255, 0.3); */
+  /* padding-left: 0.5rem; */
 }
 
 .main-content {
@@ -216,6 +229,7 @@ body {
 .menu-icon::after {
   content: '';
   position: absolute;
+  left: 0;
   width: 20px;
   height: 2px;
   background-color: white;
