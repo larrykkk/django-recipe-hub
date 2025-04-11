@@ -6,10 +6,15 @@ const recipeStore = useRecipeStore();
 const recipes = computed(() => recipeStore.recipes.slice(0, 10));
 const loading = computed(() => recipeStore.loading);
 const error = computed(() => recipeStore.error);
+const imageLoaded = ref({});
 
 onMounted(async () => {
   await recipeStore.fetchAllRecipes();
 });
+
+const handleImageLoad = (recipeId) => {
+  imageLoaded.value[recipeId] = true;
+};
 </script>
 
 <template>
@@ -50,7 +55,15 @@ onMounted(async () => {
       <div v-else class="recipe-grid">
         <div v-for="recipe in recipes" :key="recipe.id" class="recipe-item">
           <div class="recipe-image">
-            <img :src="recipe.link" :alt="recipe.title" onerror="this.src='/default-recipe.jpg'">
+            <div v-if="!imageLoaded[recipe.id]" class="skeleton-loader"></div>
+            <img 
+              :src="recipe.link" 
+              :alt="recipe.title" 
+              @load="handleImageLoad(recipe.id)" 
+              @error="handleImageLoad(recipe.id)" 
+              :class="{ 'image-loaded': imageLoaded[recipe.id] }"
+              onerror="this.src='/default-recipe.jpg'"
+            >
           </div>
           <router-link :to="'/recipes/' + recipe.id" class="view-recipe"><h3>{{ recipe.title }}</h3></router-link>
         </div>
@@ -256,6 +269,8 @@ onMounted(async () => {
   margin-bottom: 1rem;
   border-radius: 6px;
   overflow: hidden;
+  position: relative;
+  background-color: #f0f0f0;
 }
 
 .recipe-image img {
@@ -263,9 +278,35 @@ onMounted(async () => {
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+  opacity: 0;
 }
 
-.recipe-item:hover .recipe-image img {
+.recipe-image img.image-loaded {
+  opacity: 1;
+}
+
+.skeleton-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.recipe-item:hover .recipe-image img.image-loaded {
   transform: scale(1.05);
 }
 

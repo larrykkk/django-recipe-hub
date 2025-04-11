@@ -37,7 +37,7 @@ watch(() => route.path, () => {
   <div class="app-container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <router-link to="/" class="navbar-logo" @click="handleMenuClick('/')">Recipe App</router-link>
+        <router-link to="/" class="navbar-logo" @click="handleMenuClick('/')">Recipe Hub</router-link>
       </div>
       <button class="menu-toggle" @click="toggleMenu">
         <span class="menu-icon"></span>
@@ -91,9 +91,12 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: #e64a19;
-  color: white;
+  background-color: #fff;
+  color: #3a3a3a;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid #e1e4e8;
+  border-radius: 0 0 6px 6px;
+  margin-bottom: 8px;
 }
 
 .navbar-brand {
@@ -102,7 +105,7 @@ body {
 }
 
 .navbar-logo {
-  color: white;
+  color: #3a3a3a;
   text-decoration: none;
 }
 
@@ -113,7 +116,7 @@ body {
 }
 
 .navbar-item {
-  color: white;
+  color: #3a3a3a;
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -122,7 +125,8 @@ body {
 }
 
 .navbar-item:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(192, 3, 3, 0.03);
+  color: #000;
   cursor: pointer;
 }
 
@@ -217,7 +221,7 @@ body {
   display: block;
   width: 20px;
   height: 2px;
-  background-color: white;
+  background-color: #3a3a3a;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -232,7 +236,7 @@ body {
   left: 0;
   width: 20px;
   height: 2px;
-  background-color: white;
+  background-color: #3a3a3a;
   transition: all 0.3s ease;
 }
 
@@ -247,7 +251,7 @@ body {
 .menu-toggle:hover .menu-icon,
 .menu-toggle:hover .menu-icon::before,
 .menu-toggle:hover .menu-icon::after {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #000;
 }
 
 /* 當選單開啟時的動畫效果 */
@@ -286,12 +290,13 @@ body {
     top: 100%;
     left: 0;
     right: 0;
-    background-color: #e64a19;
+    background-color: #f9f7f5;
     padding: 0.5rem;
     flex-direction: column;
     gap: 0.5rem;
     z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    border-top: 1px solid #eaeaea;
   }
 
   .navbar-menu.is-open {

@@ -119,6 +119,7 @@ button:focus,
   width: 100%;
   margin: 0 auto;
   padding: 1rem;
+  background-color: #fff8ef;
 }
 
 input, textarea, select {
