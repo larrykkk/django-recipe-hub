@@ -256,8 +256,16 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     queryset = Comment.objects.all()
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]  # 移除或註釋掉這行
     lookup_field = 'pk'
+
+    def get_permissions(self):
+        """根據不同的操作返回不同的權限"""
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         """Retrieve comments with filtering options."""
@@ -277,9 +285,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             if recipe_id is not None:
                 queryset = queryset.filter(recipe_id=recipe_id)
             
-        return queryset.filter(
-            user=self.request.user
-        ).order_by('-created_on')
+        # 根據用戶認證狀態過濾查詢集    
+        if self.request.user and self.request.user.is_authenticated:
+            return queryset.filter(user=self.request.user).order_by('-created_on')
+        else:
+            # 未認證用戶顯示所有評論
+            return queryset.order_by('-created_on')
 
     def perform_create(self, serializer):
         """Create a new comment."""

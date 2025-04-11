@@ -28,7 +28,7 @@ const routes = [
     path: '/recipes',
     name: 'RecipeList',
     component: RecipeList,
-    meta: { requiresAuth: true }
+    // meta: { requiresAuth: true }
   },
   {
     path: '/recipes/create',
@@ -46,7 +46,7 @@ const routes = [
     path: '/recipes/:encodedId',
     name: 'RecipeDetail',
     component: RecipeDetail,
-    meta: { requiresAuth: true }
+    // meta: { requiresAuth: true }
   },
   {
     path: '/profile',
