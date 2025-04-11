@@ -243,7 +243,7 @@ const clearFilters = async () => {
 .recipe-list-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem 0;
 }
 
 h1 {

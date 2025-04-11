@@ -69,7 +69,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   background-color: #4CAF50;
   color: white;
 }
@@ -87,6 +87,7 @@ body {
 .navbar-menu {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 
 .navbar-item {
@@ -95,6 +96,7 @@ body {
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
   transition: background-color 0.3s;
+  white-space: nowrap;
 }
 
 .navbar-item:hover {
@@ -120,7 +122,7 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -128,7 +130,7 @@ body {
 
 .btn {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -137,6 +139,8 @@ body {
   text-decoration: none;
   font-size: 1rem;
   transition: background-color 0.3s;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .btn:hover {
@@ -162,5 +166,67 @@ body {
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .navbar-brand {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .navbar-item {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 1rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.3rem;
+  }
+
+  .navbar-item {
+    padding: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .error-message,
+  .success-message {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
