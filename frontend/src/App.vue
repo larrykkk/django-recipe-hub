@@ -48,7 +48,11 @@ watch(() => route.path, () => {
         <template v-if="loggedIn">
           <router-link to="/recipes" class="navbar-item" @click="handleMenuClick('/recipes')">Recipes</router-link>
           <router-link to="/recipes/create" class="navbar-item" @click="handleMenuClick('/recipes/create')">Create Recipe</router-link>
-          <router-link to="/profile" class="navbar-item" @click="handleMenuClick('/profile')">{{ userName }}</router-link>
+          <router-link to="/profile" class="navbar-item" @click="handleMenuClick('/profile')" style="display: flex; align-items: center;">
+            <!-- 使用者頭貼 -->
+            <img :src="'/default-avatar.png'" alt="User Avatar" class="user-avatar" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;">
+            {{ userName }}
+          </router-link>
           <a @click="logout" class="navbar-item logout-button">
             <span class="logout-text">Logout</span>
           </a>

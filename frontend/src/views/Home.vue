@@ -62,8 +62,8 @@ const handleImageLoad = (recipeId) => {
               @load="handleImageLoad(recipe.id)" 
               @error="handleImageLoad(recipe.id)" 
               :class="{ 'image-loaded': imageLoaded[recipe.id] }"
-              onerror="this.src='/default-recipe.jpg'"
             >
+            <div v-if="!recipe.link" class="no-image">No Image</div>
           </div>
           <router-link :to="'/recipes/' + recipe.id" class="view-recipe"><h3>{{ recipe.title }}</h3></router-link>
         </div>
@@ -347,4 +347,19 @@ const handleImageLoad = (recipeId) => {
     height: 140px;
   }
 }
+
+.no-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
 </style>
