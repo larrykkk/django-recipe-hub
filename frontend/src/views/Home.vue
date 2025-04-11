@@ -50,7 +50,7 @@ onMounted(async () => {
       <div v-else class="recipe-grid">
         <div v-for="recipe in recipes" :key="recipe.id" class="recipe-item">
           <div class="recipe-image">
-            <img :src="'https://fakeimg.pl/300/'" :alt="recipe.title" onerror="this.src='/default-recipe.jpg'">
+            <img :src="recipe.link" :alt="recipe.title" onerror="this.src='/default-recipe.jpg'">
           </div>
           <router-link :to="'/recipes/' + recipe.id" class="view-recipe"><h3>{{ recipe.title }}</h3></router-link>
         </div>
