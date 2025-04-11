@@ -286,8 +286,8 @@ const canManageComment = (comment) => {
 }
 
 .own-comment {
-  border-left: 3px solid #4CAF50;
-  background-color: #f9fff9;
+  border-left: 3px solid #e64a19;
+  background-color: #fff5f2;
 }
 
 .comment-header {
@@ -309,7 +309,7 @@ const canManageComment = (comment) => {
 
 .user-badge {
   font-size: 0.8rem;
-  color: #4CAF50;
+  color: #e64a19;
   margin-left: 0.5rem;
   font-weight: normal;
 }
@@ -334,11 +334,11 @@ const canManageComment = (comment) => {
 }
 
 .edit-btn {
-  color: #2196F3;
+  color: #e64a19;
 }
 
 .edit-btn:hover {
-  background-color: rgba(33, 150, 243, 0.1);
+  background-color: rgba(230, 74, 25, 0.1);
 }
 
 .delete-btn {
@@ -393,7 +393,7 @@ const canManageComment = (comment) => {
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
@@ -403,7 +403,7 @@ const canManageComment = (comment) => {
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #d84315;
 }
 
 .btn-secondary:hover {

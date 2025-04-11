@@ -263,7 +263,7 @@ h1::after {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: #4CAF50;
+  background: #e64a19;
   border-radius: 2px;
 }
 
@@ -303,8 +303,8 @@ h1::after {
 
 .search-input:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+  border-color: #e64a19;
+  box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
 }
 
 .selected-filters {
@@ -518,7 +518,7 @@ h1::after {
 }
 
 .recipe-info h3:hover {
-  color: #4CAF50;
+  color: #e64a19;
 }
 
 .recipe-author {
@@ -536,5 +536,13 @@ h1::after {
   font-size: 1.1rem;
   padding: 0.9rem 2rem;
   letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: #e64a19;
+}
+
+input:focus {
+  border-color: #e64a19;
 }
 </style>

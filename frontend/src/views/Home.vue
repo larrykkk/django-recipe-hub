@@ -79,14 +79,14 @@ const loggedIn = computed(() => authStore.loggedIn);
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
 .btn-secondary {
   background-color: #FFF;
-  color: #4CAF50;
-  border: 1px solid #4CAF50;
+  color: #e64a19;
+  border: 1px solid #e64a19;
 }
 
 .btn-primary:hover {

@@ -1,14 +1,19 @@
 <script setup>
 import { useAuthStore } from './store/auth';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const isMenuOpen = ref(false);
 
 const logout = () => {
   authStore.logout();
   router.push('/login');
+};
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
 };
 
 const loggedIn = computed(() => authStore.loggedIn);
@@ -21,7 +26,10 @@ const userName = computed(() => authStore.user?.name || authStore.user?.email ||
       <div class="navbar-brand">
         <router-link to="/" class="navbar-logo">Recipe App</router-link>
       </div>
-      <div class="navbar-menu">
+      <button class="menu-toggle" @click="toggleMenu">
+        <span class="menu-icon"></span>
+      </button>
+      <div class="navbar-menu" :class="{ 'is-open': isMenuOpen }">
         <a href="/api/docs" target="_blank" class="navbar-item">API Docs</a>
         <router-link to="/" class="navbar-item">Home</router-link>
         <template v-if="loggedIn">
@@ -55,8 +63,8 @@ const userName = computed(() => authStore.user?.name || authStore.user?.email ||
 body {
   font-family: 'Arial', sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f5f5;
+  color: #2c3e50;
+  background-color: #f8f9fa;
 }
 
 .app-container {
@@ -70,8 +78,9 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -95,12 +104,12 @@ body {
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .navbar-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   cursor: pointer;
 }
 
@@ -116,7 +125,7 @@ body {
 }
 
 .logout-text {
-  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
   padding-left: 0.5rem;
 }
 
@@ -126,76 +135,166 @@ body {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .btn {
   display: inline-block;
   padding: 0.75rem 1.25rem;
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   text-decoration: none;
   font-size: 1rem;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
   min-height: 44px;
   min-width: 44px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover {
-  background-color: #45a049;
+  background-color: #d84315;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn:disabled {
-  background-color: #cccccc;
+  background-color: #bdc3c7;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .error-message {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: #fee2e2;
+  color: #dc2626;
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border: 1px solid #fecaca;
 }
 
 .success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: #dcfce7;
+  color: #16a34a;
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border: 1px solid #bbf7d0;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+
+.menu-icon {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.menu-icon::before {
+  top: -6px;
+}
+
+.menu-icon::after {
+  bottom: -6px;
+}
+
+.menu-toggle:hover .menu-icon,
+.menu-toggle:hover .menu-icon::before,
+.menu-toggle:hover .menu-icon::after {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 當選單開啟時的動畫效果 */
+.menu-toggle.is-open .menu-icon {
+  background-color: transparent;
+}
+
+.menu-toggle.is-open .menu-icon::before {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.menu-toggle.is-open .menu-icon::after {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* 響應式設計 */
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
+    flex-direction: row;
+    padding: 0.75rem 1rem;
+    position: relative;
   }
 
   .navbar-brand {
-    width: 100%;
-    text-align: center;
+    width: auto;
+    text-align: left;
+  }
+
+  .menu-toggle {
+    display: block;
   }
 
   .navbar-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #e64a19;
+    padding: 0.5rem;
     flex-direction: column;
-    width: 100%;
     gap: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar-menu.is-open {
+    display: flex;
   }
 
   .navbar-item {
     width: 100%;
-    text-align: center;
+    text-align: left;
     padding: 0.75rem;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .main-content {
-    padding: 0;
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 4px;
   }
 
   .btn {
@@ -206,20 +305,21 @@ body {
 
 @media (max-width: 480px) {
   .navbar {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .navbar-brand {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .navbar-item {
     padding: 0.6rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .main-content {
-    padding: 0;
+    padding: 1rem;
+    margin: 0.5rem 0;
     max-width: 100%;
   }
 

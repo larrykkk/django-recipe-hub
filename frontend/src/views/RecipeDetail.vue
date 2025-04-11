@@ -198,7 +198,7 @@ onMounted(async () => {
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
@@ -213,7 +213,7 @@ onMounted(async () => {
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #d84315;
 }
 
 .btn-secondary:hover {
@@ -351,5 +351,10 @@ onMounted(async () => {
 .back-link {
   margin-top: 3rem;
   text-align: center;
+}
+
+.success-message {
+  background-color: #fff5f2;
+  color: #d84315;
 }
 </style>

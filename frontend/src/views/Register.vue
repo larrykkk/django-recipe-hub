@@ -161,7 +161,7 @@ input {
 }
 
 .login-link a {
-  color: #4CAF50;
+  color: #e64a19;
   text-decoration: none;
 }
 

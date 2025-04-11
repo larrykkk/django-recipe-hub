@@ -422,7 +422,7 @@ textarea {
 .selected-item {
   display: inline-flex;
   align-items: center;
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
@@ -473,7 +473,7 @@ textarea {
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
@@ -483,7 +483,7 @@ textarea {
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #d84315;
 }
 
 .btn-secondary:hover {

@@ -10,8 +10,8 @@
   -moz-osx-font-smoothing: grayscale;
 
   /* 全局顏色變量 */
-  --color-primary: #4CAF50;
-  --color-primary-hover: #43a047;
+  --color-primary: #e64a19;
+  --color-primary-hover: #d84315;
   --color-secondary: #f1f5f9;
   --color-secondary-hover: #e2e8f0;
   --color-danger: #ef4444;

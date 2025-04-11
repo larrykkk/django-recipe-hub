@@ -319,11 +319,11 @@ const logout = () => {
 
 .sidebar-item:hover {
   background-color: #f5f5f5;
-  color: #4CAF50;
+  color: #e64a19;
 }
 
 .sidebar-item.active {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
@@ -405,8 +405,8 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+  border-color: #e64a19;
+  box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
 }
 
 .btn {
@@ -419,12 +419,12 @@ input:focus {
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #e64a19;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #d84315;
 }
 
 .btn:disabled {
@@ -436,7 +436,7 @@ input:focus {
   width: 100%;
   background-color: #f9fafb;
   border-radius: 8px;
-  border: 2px solid #4CAF50;
+  border: 2px solid #e64a19;
   overflow: hidden;
   flex: 1;
   display: flex;
@@ -469,12 +469,12 @@ input:focus {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
-  color: #374151;
+  color: #e64a19;
   flex: 1;
 }
 
 .recipe-title:hover {
-  color: #4CAF50;
+  color: #e64a19;
 }
 
 .recipe-date {
@@ -596,5 +596,13 @@ input:focus {
   .recipe-actions {
     display: none;
   }
+}
+
+.profile-header {
+  color: #e64a19;
+}
+
+.recipe-card:hover {
+  border: 2px solid #e64a19;
 }
 </style>
